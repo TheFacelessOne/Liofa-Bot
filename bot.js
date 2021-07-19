@@ -62,7 +62,8 @@ async function messageRec(msg) {
 
 
   // Returns error for when language cannot be detected 
-  catch {
+  catch (err){
+    console.log(err);
     return;
   }
 }
@@ -96,6 +97,12 @@ async function liofaCheck(LiofaMsg) {
 
 // Check Warning Status
 function liofaMod(ServerID, UserID) {
+  if (typeof LiofaWatch[ServerID] === "undefined") {
+    LiofaWatch[ServerID] = {};
+  }
+  if (typeof LiofaWatch[ServerID][UserID] === "undefined") {
+    LiofaWatch[ServerID][UserID] = {};
+  }
   if (typeof LiofaWatch[ServerID][UserID].warnings === 'undefined') { 
     LiofaWatch[ServerID][UserID] = {warnings : 1, time : Date.now()};
 
