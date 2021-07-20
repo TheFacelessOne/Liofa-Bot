@@ -9,9 +9,11 @@ const client = new Discord.Client();
 client.login(process.env.BOTTOKEN);
 
 // Variables
-const LiofaMessages = require("./Server Data/Responses");
+const LiofaMessages = require("./Read Only/Responses");
 const RawWatch = fs.readFileSync("./Server Data/WatchList.json");
 const LiofaWatch = JSON.parse(RawWatch);
+const RawSettings = fs.readFileSync("./Server Data/Settings.json");
+let LiofaSettings = JSON.parse(RawSettings);
 let LiofaState = true;
 
 //Defines callbacks
@@ -119,9 +121,3 @@ function liofaMod(ServerID, UserID) {
   console.log("JSON updated")
   return LiofaWatch[ServerID][UserID].warnings;
 }
-
-//TODO
-// Add in configurable settings
-// Add commands
-// Add roles that are excluded
-// Learn how to use databases
