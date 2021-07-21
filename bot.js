@@ -44,7 +44,7 @@ function liofaJoin(Server) {
 	if (fs.existsSync(FileAddress)) {
 		return;
 	}
-	const tempSettings = fs.readFileSync('./Server Data/Settings.json');
+	const tempSettings = fs.readFileSync('./Read Only/Settings.json');
 	fs.writeFileSync(FileAddress, tempSettings);
 	LiofaData[Server.id] = JSON.parse(fs.readFileSync(FileAddress));
 	console.log('Joined new server ' + Server.id.toString());
@@ -104,7 +104,7 @@ function runLiofa(msg2) {
 	if (msg2.author.bot === true) {
 		return false;
 
-		// Checks if Liofa is turned on
+		// Checks if it's a command
 	}
 	else if (msg2.content.includes('--') && msg2.content.search('--') == 0) {
 		const args = msg2.content.slice(2).trim().split(' ');
@@ -113,6 +113,10 @@ function runLiofa(msg2) {
 		if (!client.commands.has(command)) return;
 
 		try {
+			if (!msg2.author.hasPermission('ADMINISTRATOR') || !msg2.member.roles.cache.some(role => LiofaData[msg2.guild.id]['Permissions'][command].includes(role.id))) {
+				msg2.reply(' has insufficient permissions');
+				return;
+			}
 			client.commands.get(command).execute(msg2, args);
 			return false;
 		}
