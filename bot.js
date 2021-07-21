@@ -1,123 +1,157 @@
 // Defines required stuff
-require("dotenv").config();
+require('dotenv').config();
 const cld = require('cld');
-const Discord = require("discord.js");
-const fs = require("fs");
+const Discord = require('discord.js');
+const fs = require('fs');
 
 // Discord stuff
 const client = new Discord.Client();
 client.login(process.env.BOTTOKEN);
 
-// Variables
-const LiofaMessages = require("./Read Only/Responses");
-const RawWatch = fs.readFileSync("./Server Data/WatchList.json");
-const LiofaWatch = JSON.parse(RawWatch);
-const RawSettings = fs.readFileSync("./Server Data/Settings.json");
-let LiofaSettings = JSON.parse(RawSettings);
-let LiofaState = true;
+// Commands
+client.commands = new Discord.Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	// set a new item in the Collection
+	// with the key as the command name and the value as the exported module
+	client.commands.set(command.name, command);
+}
 
-//Defines callbacks
-client.on("message", messageRec);
+// Variables
+const LiofaMessages = require('./Read Only/Responses');
+const LiofaData = {};
+fs.readdirSync('./Server Data/').forEach(file => {
+	const name = file.slice(0, -5);
+	LiofaData[name] = JSON.parse(fs.readFileSync('./Server Data/' + file));
+});
+const LiofaState = true;
+
+// Defines callbacks
+client.on('guildCreate', liofaJoin);
+client.on('message', messageRec);
 
 // Start-up confirmation
 client.once('ready', () => {
 	console.log('Líofa is Talking!');
 });
 
+// Run on joining a new server
+function liofaJoin(Server) {
+
+	// Creates file for server data
+	const FileAddress = './Server Data/' + Server.id + '.json';
+	if (fs.existsSync(FileAddress)) {
+		return;
+	}
+	const tempSettings = fs.readFileSync('./Server Data/Settings.json');
+	fs.writeFileSync(FileAddress, tempSettings);
+	LiofaData[Server.id] = JSON.parse(fs.readFileSync(FileAddress));
+	console.log('Joined new server ' + Server.id.toString());
+}
 
 
 // Run on every message
 async function messageRec(msg) {
 
-  // Checks if Liofa should run on this message
-  if (runLiofa(msg) === false) {
-    return;
-  }
+	// Checks if Liofa should run on this message
+	if (runLiofa(msg) === false) {
+		return;
+	}
 
-  // Runs Liofa
-  try {
-    // Asks what the language is
-    const result = await liofaCheck(msg.content);
-
-
-    // Gives output if it's not English
-    if (result.code != "en") {
-
-      //Warnings Check
-      let warnCount = liofaMod(msg.guild.id, msg.author.id);
-      if (warnCount < 3) {
-
-        // Checks if output for given language is available
-        if (typeof LiofaMessages[result.code] === 'string') {
-          msg.reply(LiofaMessages[result.code]);
-        } else {
-          msg.reply("Please Speak English");
-          msg.channel.send(result.name + " must be added to Languages");
-        }
-      } else if (warnCount == 3) {
-        msg.reply("All further messages will be deleted unless you talk English");
-      } else if (warnCount > 3) {
-        msg.delete();
-      }
-    }
-  }
+	// Runs Liofa
+	try {
+		// Asks what the language is
+		const result = await liofaCheck(msg.content);
 
 
-  // Returns error for when language cannot be detected 
-  catch (err){
-    console.log(err);
-    return;
-  }
+		// Gives output if it's not English
+		if (result.code != 'en') {
+
+			// Warnings Check
+			const warnCount = liofaMod(msg.guild.id, msg.author.id);
+			if (warnCount < 3) {
+
+				// Checks if output for given language is available
+				if (typeof LiofaMessages[result.code] === 'string') {
+					msg.reply(LiofaMessages[result.code]);
+				}
+				else {
+					msg.reply('Please Speak English');
+					msg.channel.send(result.name + ' must be added to Languages');
+				}
+			}
+			else if (warnCount == 3) {
+				msg.reply('All further messages will be deleted unless you talk English');
+			}
+			else if (warnCount > 3) {
+				msg.delete();
+			}
+		}
+	}
+
+
+	// Returns error for when language cannot be detected
+	catch (err) {
+		console.log(err);
+		return;
+	}
 }
 
 // Checks if Liofa should run
 function runLiofa(msg2) {
-  // Checks if it's a Bot
-  if (msg2.author.bot === true) {
-    return false;
-  
-  // Checks if Liofa is turned on  
-  } else if (msg2.content.includes("**")) {
-    if (msg2.content === "**enable") {
-      LiofaState = true;
-      msg2.reply("Liofa is enabled")
-    }else if(msg2.content === "**disable") {
-      LiofaState = false;
-      msg2.reply("Liofa is disabled")
-    }
-  }
-  return LiofaState;
-  // TODO Add excluded roles in here
+	// Checks if it's a Bot
+	if (msg2.author.bot === true) {
+		return false;
+
+		// Checks if Liofa is turned on
+	}
+	else if (msg2.content.includes('--') && msg2.content.search('--') == 0) {
+		const args = msg2.content.slice(2).trim().split(' ');
+		const command = args.shift().toLowerCase();
+
+		if (!client.commands.has(command)) return;
+
+		try {
+			client.commands.get(command).execute(msg2, args);
+			return false;
+		}
+		catch (error) {
+			console.error(error);
+			msg2.reply('something went wrong');
+		}
+	}
+	return LiofaState;
+	// TODO Add excluded roles in here
 }
 
 
 // Check for Language
 async function liofaCheck(LiofaMsg) {
-  const LiofaResult = await cld.detect(LiofaMsg);
-  return LiofaResult.languages[0];
+	const LiofaResult = await cld.detect(LiofaMsg);
+	return LiofaResult.languages[0];
 }
 
 // Check Warning Status
 function liofaMod(ServerID, UserID) {
-  if (typeof LiofaWatch[ServerID] === "undefined") {
-    LiofaWatch[ServerID] = {};
-  }
-  if (typeof LiofaWatch[ServerID][UserID] === "undefined") {
-    LiofaWatch[ServerID][UserID] = {};
-  }
-  if (typeof LiofaWatch[ServerID][UserID].warnings === 'undefined') { 
-    LiofaWatch[ServerID][UserID] = {warnings : 1, time : Date.now()};
+	let UserRef = LiofaData[ServerID]['Watchlist'][UserID];
 
-  } else if ((Date.now() - LiofaWatch[ServerID][UserID].time) < 1800000) { // 1800000 = 30 mins in milliseconds
-    LiofaWatch[ServerID][UserID].warnings++;
-    LiofaWatch[ServerID][UserID].time = Date.now();    
+	if (typeof UserRef === 'undefined') {
+		UserRef = { warnings : 1, time : Date.now() };
+	}
 
-  } else {
-    LiofaWatch[ServerID][UserID] = {warnings : 1, time : Date.now()};
+	else if ((Date.now() - UserRef.time) < 1800000) {
+		UserRef.warnings++;
+		UserRef.time = Date.now();
 
-  }
-  let LiofaUpdate = JSON.stringify(LiofaWatch, null, 2);
-  fs.writeFileSync("./Server Data/WatchList.json", LiofaUpdate);
-  console.log("JSON updated")
-  return LiofaWatch[ServerID][UserID].warnings;
+	}
+	else {
+		UserRef = { warnings : 1, time : Date.now() };
+
+	}
+	LiofaData[ServerID]['Watchlist'][UserID] = UserRef;
+	const LiofaUpdate = JSON.stringify(LiofaData[ServerID], null, 2);
+	fs.writeFileSync('./Server Data/' + ServerID + '.json', LiofaUpdate);
+	console.log(ServerID + '.json updated');
+	return UserRef.warnings;
 }

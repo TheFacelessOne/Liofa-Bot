@@ -18,13 +18,14 @@ I would appreciate any and all help with translations. I only speak English myse
 - Add in configurable settings per server for 
    - [ ] Time
    - [ ] Warning count
-   - [ ] Acceptable Languages
+   - [ ] Acceptable Language(s)
 - Add commands to help with moderation
     - [ ] Remove warnings
     - [ ] Reset Timer
     - [ ] Remove User
 - [ ] Add configurable roles that are excluded
 - [ ] Add a way for moderators to tell what language someone is speaking
+- [x] Change to per server filesystem
 - [ ] Learn how to use databases so I'm not saving information in a JSON
 
 ##### About Liofa
