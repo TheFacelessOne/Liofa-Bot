@@ -5,11 +5,10 @@
 - Instructs user to speak English in whichever language they're speaking (If known)
 - Deletes  all future non-English Messages if User sends 3 messages within 30 minutes that are not English
 
-## Commands
+## Commands (Currently not functioning)
 Input | Function
 ------------|--------------------
-`**enable` | Turns on Liofa  
-`**disable` | Turns off Liofa
+`--toggle` | Turns on Liofa  
 
 ## Translations
 I would appreciate any and all help with translations. I only speak English myself so most translations I am using are from google translate or my friends.
