@@ -1,2 +1,4 @@
 .env
 Server Data/
+
+.vscode/launch.json

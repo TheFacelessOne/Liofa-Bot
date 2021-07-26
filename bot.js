@@ -117,7 +117,6 @@ function runLiofa(msg2) {
 			client.commands.get(command).execute(msg2, args);
 			if (command == 'reset' || command == 'toggle') {
 				LiofaData[msg2.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg2.guild.id + '.json'));
-				console.log(LiofaData[msg2.guild.id]);
 			}
 			return false;
 		}
