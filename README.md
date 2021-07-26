@@ -17,6 +17,8 @@ A Discord Bot for dealing with people speaking other languages
 Input | Function
 ------------|--------------------
 `--toggle` | Toggles Liofa
+`--perms` | Toggles permissions per role
+`--reset` | Brings Liofa's Settings back to the default settings
 
   
 
@@ -38,7 +40,9 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [ ] Reset Timer
 	- [ ] Remove User
 	- [ ] Change Settings
-	- [ ] Change Permissions
+	- [x] Change Permissions
+	- [x] Reset all settings
+	- [ ] Help command
 
 - [ ] Add configurable roles that are excluded
 
@@ -49,6 +53,8 @@ I would appreciate any and all help with translations. I only speak English myse
 -  [x] Change to per server filesystem
 
 - [ ] Learn how to use databases so I'm not saving information in a JSON
+
+- [ ] Find a pretty profile picture for the bot
 
   
 

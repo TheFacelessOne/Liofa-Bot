@@ -8,7 +8,6 @@ module.exports = {
 	description: 'toggles Liofa',
 	execute(msg) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		console.log('toggling');
 		if (typeof Data.Settings.State == 'boolean') {
 			Data.Settings.State = !Data.Settings.State;
 		}

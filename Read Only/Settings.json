@@ -1,5 +1,12 @@
 {
-    "Watchlist" : {},
-    "Settings" : { "State": true },
-    "Permissions" : { "toggle" : [] }
-}
+    "Watchlist": {},
+    "Settings": {
+      "State": true
+    },
+    "Permissions": {
+      "toggle": [],
+      "perms": [],
+      "reset": [],
+      "excluded": []
+    }
+  }

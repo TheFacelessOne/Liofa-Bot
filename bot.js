@@ -25,7 +25,6 @@ fs.readdirSync('./Server Data/').forEach(file => {
 	const name = file.slice(0, -5);
 	LiofaData[name] = JSON.parse(fs.readFileSync('./Server Data/' + file));
 });
-const LiofaState = true;
 
 // Defines callbacks
 client.on('guildCreate', liofaJoin);
@@ -59,7 +58,6 @@ async function messageRec(msg) {
 		return;
 	}
 
-	// Runs Liofa
 	try {
 		// Asks what the language is
 		const result = await liofaCheck(msg.content);
@@ -93,7 +91,6 @@ async function messageRec(msg) {
 
 	// Returns error for when language cannot be detected
 	catch (err) {
-		console.log(err);
 		return;
 	}
 }
@@ -104,7 +101,7 @@ function runLiofa(msg2) {
 	if (msg2.author.bot === true) {
 		return false;
 
-		// Checks if it's a command
+	// Checks if it's a command
 	}
 	else if (msg2.content.includes('--') && msg2.content.search('--') == 0) {
 		const args = msg2.content.slice(2).trim().split(' ');
@@ -113,11 +110,15 @@ function runLiofa(msg2) {
 		if (!client.commands.has(command)) return;
 
 		try {
-			if (!msg2.author.hasPermission('ADMINISTRATOR') || !msg2.member.roles.cache.some(role => LiofaData[msg2.guild.id]['Permissions'][command].includes(role.id))) {
+			if (!msg2.member.hasPermission('ADMINISTRATOR') && !msg2.member.roles.cache.some(role => LiofaData[msg2.guild.id]['Permissions'][command].includes(role.id))) {
 				msg2.reply(' has insufficient permissions');
 				return;
 			}
 			client.commands.get(command).execute(msg2, args);
+			if (command == 'reset' || command == 'toggle') {
+				LiofaData[msg2.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg2.guild.id + '.json'));
+				console.log(LiofaData[msg2.guild.id]);
+			}
 			return false;
 		}
 		catch (error) {
@@ -125,7 +126,7 @@ function runLiofa(msg2) {
 			msg2.reply('something went wrong');
 		}
 	}
-	return LiofaState;
+	return LiofaData[msg2.guild.id].Settings.State;
 	// TODO Add excluded roles in here
 }
 
