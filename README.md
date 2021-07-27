@@ -19,6 +19,7 @@ Input | Function
 `--toggle` | Toggles Liofa
 `--perms` | Toggles permissions per role
 `--reset` | Brings Liofa's Settings back to the default settings
+`--mod` | Moderator commands
 
   
 
@@ -36,7 +37,7 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [ ] Acceptable Language(s)
 
 - Planned Commands
-	- [ ] Remove warnings
+	- [x] Remove warnings
 	- [ ] Reset Timer
 	- [ ] Remove User
 	- [ ] Change Settings
@@ -55,6 +56,8 @@ I would appreciate any and all help with translations. I only speak English myse
 - [ ] Learn how to use databases so I'm not saving information in a JSON
 
 - [x] Find a pretty profile picture for the bot
+
+- [ ] Make bot output embed messages
 
   
 

@@ -1,4 +1,4 @@
-module.exports = { roleToString, roleToID };
+module.exports = { roleToString, roleToID, userToString, userToID };
 
 function roleToString(identifier, msg) {
 	if (!isNaN(identifier) && msg.guild.roles.cache.has(identifier)) {
@@ -29,6 +29,38 @@ function roleToID(identifier, msg) {
 	}
 	else {
 		msg.channel.send('Something went wrong converting the role name. Maybe try using the role ID instead');
+		return undefined;
+	}
+}
+
+function userToString(identifier, msg) {
+	if (!isNaN(identifier) && msg.guild.members.cache.has(identifier)) {
+		const LookUpMember = msg.guild.members.cache.find(member => member.id === identifier);
+		return LookUpMember.displayName;
+	}
+	else if (typeof identifier == 'string') {
+		return identifier;
+	}
+	else {
+		return 'Unknown User';
+	}
+}
+
+function userToID(identifier, msg) {
+	// eslint-disable-next-line no-useless-escape
+	const exp = new RegExp(/^\<\@\!\d{15,}\>$/);
+	if (!isNaN(identifier)) {
+		return identifier;
+	}
+	else if (identifier.match(exp)) {
+		while(isNaN(identifier.charAt(0))) {
+			identifier = identifier.substring(1);
+		}
+		identifier = identifier.substring(0, identifier.length - 1);
+		return identifier;
+	}
+	else {
+		msg.channel.send('Something went wrong converting the username. Maybe try using the user ID instead');
 		return undefined;
 	}
 }
