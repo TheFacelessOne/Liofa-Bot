@@ -24,8 +24,13 @@ module.exports = {
 		}
 		// if the permission you're asking for doesn't exist
 		else if (typeof Data.Permissions[args[0]] === 'undefined') {
-			msg.channel.send('No such permission');
-			return;
+			if (args.length == 0) {
+				msg.channel.send('No permission given, use "--perms list" to see all permissions');
+			}
+			else {
+				msg.channel.send('No such permission, use "--perms list" to see all permissions');
+				return;
+			}
 		}
 		// Used for toggling what roles can use what commands
 		else {

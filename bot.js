@@ -100,9 +100,8 @@ function runLiofa(msg2) {
 	// Checks if it's a Bot
 	if (msg2.author.bot === true) {
 		return false;
-
-	// Checks if it's a command
 	}
+	// Checks if it's a command
 	else if (msg2.content.includes('--') && msg2.content.search('--') == 0) {
 		const args = msg2.content.slice(2).trim().split(' ');
 		const command = args.shift().toLowerCase();
@@ -115,9 +114,7 @@ function runLiofa(msg2) {
 				return;
 			}
 			client.commands.get(command).execute(msg2, args);
-			if (command == 'reset' || command == 'toggle') {
-				LiofaData[msg2.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg2.guild.id + '.json'));
-			}
+			LiofaData[msg2.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg2.guild.id + '.json'));
 			return false;
 		}
 		catch (error) {
@@ -125,8 +122,11 @@ function runLiofa(msg2) {
 			msg2.reply('something went wrong');
 		}
 	}
+	// Checks if they have a role from the excluded roles list
+	else if (msg2.member.roles.cache.some(ExcludedRole => LiofaData[msg2.guild.id].Permissions.excluded.includes(ExcludedRole.id))) {
+		return false;
+	}
 	return LiofaData[msg2.guild.id].Settings.State;
-	// TODO Add excluded roles in here
 }
 
 

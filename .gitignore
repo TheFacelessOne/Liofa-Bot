@@ -1,4 +1,5 @@
 .env
 Server Data/
 
-.vscode/launch.json
+.vscode/
+node_modules/

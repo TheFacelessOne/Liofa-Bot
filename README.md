@@ -44,7 +44,7 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [x] Reset all settings
 	- [ ] Help command
 
-- [ ] Add configurable roles that are excluded
+- [x] Add configurable roles that are excluded
 
 -  [x] Permissions system
 
@@ -54,7 +54,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [ ] Learn how to use databases so I'm not saving information in a JSON
 
-- [ ] Find a pretty profile picture for the bot
+- [x] Find a pretty profile picture for the bot
 
   
 
