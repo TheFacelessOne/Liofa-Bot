@@ -5,7 +5,7 @@
   "main": "bot.js",
   "scripts": {
     "start": "node bot.js"
-  }
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
