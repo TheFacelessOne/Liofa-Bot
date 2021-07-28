@@ -33,7 +33,7 @@ module.exports = {
 				return;
 			}
 			else {
-				msg.channel.send('One or more of the given users have 0 infractions');
+				msg.channel.send('One or more of the given users have 0 infractions or do not exist');
 				return;
 			}
 		}
@@ -41,7 +41,7 @@ module.exports = {
 			args.shift();
 			for (let i = 0; i < args.length; i++) {
 				Data.Watchlist[args[i]].warnings = 0;
-				msg.channel.send(functions.userToString(msg.author.id, msg) + '\'s infractions have been reset');
+				msg.channel.send(functions.userToString(args[i], msg) + '\'s infractions have been reset');
 			}
 			fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', JSON.stringify(Data, null, 2));
 			return;
