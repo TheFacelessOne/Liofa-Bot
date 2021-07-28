@@ -16,10 +16,10 @@ A Discord Bot for dealing with people speaking other languages
 
 Input | Function
 ------------|--------------------
-`--toggle` | Toggles Liofa
-`--perms` | Toggles permissions per role
-`--reset` | Brings Liofa's Settings back to the default settings
-`--mod` | Moderator commands
+`&toggle` | Toggles Liofa
+`&perms` | Toggles permissions per role
+`&reset` | Brings Liofa's Settings back to the default settings
+`&mod` | Moderator commands
 
   
 
@@ -38,8 +38,6 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - Planned Commands
 	- [x] Remove warnings
-	- [ ] Reset Timer
-	- [ ] Remove User
 	- [ ] Change Settings
 	- [x] Change Permissions
 	- [x] Reset all settings
@@ -49,7 +47,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 -  [x] Permissions system
 
-- [ ] Add a way for moderators to tell what language someone is speaking
+- [x] Add a way for moderators to tell what language someone is speaking
 
 -  [x] Change to per server filesystem
 

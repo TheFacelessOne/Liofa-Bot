@@ -72,7 +72,7 @@ async function messageRec(msg) {
 
 				// Checks if output for given language is available
 				if (typeof LiofaMessages[result.code] === 'string') {
-					msg.reply(LiofaMessages[result.code]);
+					msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%]`');
 				}
 				else {
 					msg.reply('Please Speak English');
@@ -102,8 +102,8 @@ function runLiofa(msg2) {
 		return false;
 	}
 	// Checks if it's a command
-	else if (msg2.content.includes('--') && msg2.content.search('--') == 0) {
-		const args = msg2.content.slice(2).trim().split(' ');
+	else if (msg2.content.includes('&') && msg2.content.search('&') == 0) {
+		const args = msg2.content.slice(1).trim().split(' ');
 		const command = args.shift().toLowerCase();
 
 		if (!client.commands.has(command)) return;
