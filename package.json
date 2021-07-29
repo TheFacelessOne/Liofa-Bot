@@ -14,9 +14,7 @@
     "discord.js": "^12.5.3",
     "dotenv": "^10.0.0",
     "eslint": "^7.31.0",
-    "fs": "^0.0.1-security",
-    "sql": "^0.78.0",
-    "sqlite": "^4.0.23"
+    "fs": "^0.0.1-security"
   },
   "devDependencies": {
     "eslint-config-prettier": "^8.3.0",
