@@ -57,6 +57,8 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [ ] Make bot output embed messages
 
+- [ ] Enable versions checking and automatic updating for each server's files
+
   
 
 ##### About Liofa

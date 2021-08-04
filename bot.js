@@ -75,8 +75,8 @@ async function messageRec(msg) {
 					msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%]`');
 				}
 				else {
-					msg.reply('Please Speak English');
-					msg.channel.send(result.name + ' must be added to Languages');
+					msg.reply('**Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
+					msg.channel.send(result.name + ' must be added to Languages `[' + result.code + ']`');
 				}
 			}
 			else if (warnCount == 3) {

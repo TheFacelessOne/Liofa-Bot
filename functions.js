@@ -48,7 +48,7 @@ function userToString(identifier, msg) {
 
 function userToID(identifier, msg) {
 	// eslint-disable-next-line no-useless-escape
-	const exp = new RegExp(/^\<\@\!\d{15,}\>$/);
+	const exp = new RegExp(/^\<\@\d{15,}\>$/);
 	if (!isNaN(identifier)) {
 		return identifier;
 	}
@@ -61,6 +61,8 @@ function userToID(identifier, msg) {
 	}
 	else {
 		msg.channel.send('Something went wrong converting the username. Maybe try using the user ID instead');
+		console.log('User mention to ID conversion failure');
+		console.log('guild name : ' + msg.guild.id + ' guild id : ' + msg.guild.name + ' message : ' + msg.content);
 		return undefined;
 	}
 }
