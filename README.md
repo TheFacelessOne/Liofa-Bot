@@ -20,6 +20,7 @@ Input | Function
 `&perms` | Toggles permissions per role
 `&reset` | Brings Liofa's Settings back to the default settings
 `&mod` | Moderator commands
+`&whitelist` | Whitelists words to ignore
 
   
 
@@ -45,6 +46,8 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [x] Add configurable roles that are excluded
 
+- [ ] Add configurable channels that are ignored
+
 -  [x] Permissions system
 
 - [x] Add a way for moderators to tell what language someone is speaking
@@ -57,7 +60,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [ ] Make bot output embed messages
 
-- [ ] Enable versions checking and automatic updating for each server's files
+- [x] Enable versions checking and automatic updating for each server's files
 
   
 
