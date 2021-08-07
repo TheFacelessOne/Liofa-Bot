@@ -1,13 +1,16 @@
 {
+    "Version" : "1.6.0",
     "Watchlist": {},
     "Settings": {
-      "State": true
+      "State": true,
+      "Whitelist": []
     },
     "Permissions": {
       "toggle": [],
       "perms": [],
       "reset": [],
       "mod": [],
-      "excluded": []
+      "excluded": [],
+      "whitelist": []
     }
   }

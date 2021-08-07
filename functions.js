@@ -1,4 +1,4 @@
-module.exports = { roleToString, roleToID, userToString, userToID };
+module.exports = { roleToString, roleToID, userToString, userToID, removeFromString };
 
 function roleToString(identifier, msg) {
 	if (!isNaN(identifier) && msg.guild.roles.cache.has(identifier)) {
@@ -65,4 +65,9 @@ function userToID(identifier, msg) {
 		console.log('guild name : ' + msg.guild.id + ' guild id : ' + msg.guild.name + ' message : ' + msg.content);
 		return undefined;
 	}
+}
+
+function removeFromString(arr, str) {
+	const regex = new RegExp('\\b' + arr.join('|') + '\\b', 'gi');
+	return str.replace(regex, '');
 }

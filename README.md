@@ -20,6 +20,7 @@ Input | Function
 `&perms` | Toggles permissions per role
 `&reset` | Brings Liofa's Settings back to the default settings
 `&mod` | Moderator commands
+`&whitelist` | Whitelists words to ignore
 
   
 
@@ -44,6 +45,8 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [ ] Help command
 
 - [x] Add configurable roles that are excluded
+
+- [ ] Add configurable channels that are ignored
 
 -  [x] Permissions system
 

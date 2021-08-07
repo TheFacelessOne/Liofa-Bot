@@ -19,6 +19,8 @@ for (const file of commandFiles) {
 }
 
 // Variables
+const readSettings = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
+const functions = require('./functions.js');
 const LiofaMessages = require('./Read Only/Responses');
 const LiofaData = {};
 fs.readdirSync('./Server Data/').forEach(file => {
@@ -32,8 +34,29 @@ client.on('message', messageRec);
 
 // Start-up confirmation
 client.once('ready', () => {
+	for (const server in LiofaData) {
+		versionCheck(server);
+	}
 	console.log('Líofa is Talking!');
 });
+
+function versionCheck(server) {
+	if (LiofaData[server].Version != readSettings.Version) {
+		for (const setting in readSettings.Settings) {
+			if (typeof LiofaData[server]['Settings'][setting] === 'undefined') {
+				LiofaData[server]['Settings'][setting] = readSettings.Settings[setting];
+				LiofaData[server].Version = readSettings.Version;
+			}
+		}
+		for (const permission in readSettings.Permissions) {
+			if (typeof LiofaData[server]['Permissions'][permission] === 'undefined') {
+				LiofaData[server]['Permissions'][permission] = readSettings.Permissions[permission];
+				LiofaData[server].Version = readSettings.Version;
+			}
+		}
+		fs.writeFileSync('./Server Data/' + server + '.json', JSON.stringify(LiofaData[server], null, 2));
+	}
+}
 
 // Run on joining a new server
 function liofaJoin(Server) {
@@ -43,8 +66,7 @@ function liofaJoin(Server) {
 	if (fs.existsSync(FileAddress)) {
 		return;
 	}
-	const tempSettings = fs.readFileSync('./Read Only/Settings.json');
-	fs.writeFileSync(FileAddress, tempSettings);
+	fs.writeFileSync(FileAddress, readSettings);
 	LiofaData[Server.id] = JSON.parse(fs.readFileSync(FileAddress));
 	console.log('Joined new server ' + Server.id.toString());
 }
@@ -60,11 +82,12 @@ async function messageRec(msg) {
 
 	try {
 		// Asks what the language is
-		const result = await liofaCheck(msg.content);
+		const MessageContent = functions.removeFromString(LiofaData[msg.guild.id].Settings.Whitelist, msg.content);
+		const result = await liofaCheck(MessageContent);
 
 
-		// Gives output if it's not English
-		if (result.code != 'en') {
+		// Gives output if it's not English (or scots or interlingue)
+		if (result.code != 'en' && result.code != 'sco' && result.code != 'ie') {
 
 			// Warnings Check
 			const warnCount = liofaMod(msg.guild.id, msg.author.id);
