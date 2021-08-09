@@ -27,7 +27,7 @@ module.exports = {
 				// Makes information easier to read
 				for (let i = 0; i < args.length; i++) {
 					msg.channel.send('name : ' + functions.userToString(args[i], msg));
-					Watchlist[args[i]].time = functions.minutesSince(Date.now, Data.Watchlist[args[i]].time);
+					Watchlist[args[i]].time = functions.minutesSince(Date.now(), Data.Watchlist[args[i]].time);
 					let list = JSON.stringify(Watchlist[args[i]]);
 					for (let x = 0; x < Exp.length; x++) {
 						list = list.replace(Exp[x], repl[x]);
