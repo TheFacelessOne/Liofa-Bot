@@ -7,22 +7,27 @@ module.exports = {
 	name: 'mod',
 	description: 'moderator commands',
 	execute(msg, args) {
+		// Reads file for given server
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
+
+		// Converts all given users to their IDs
 		for (let i = 1; i < args.length; i++) {
 			args[i] = functions.userToID(args[i], msg);
 		}
+
 		// Gives info on listed users
 		if (args[0] == 'info' || args[0] == 'i') {
 			args.shift();
-			msg.channel.send('**Here is the requested information**');
+
 			// Checks listed users exist on the watchlist
 			if (args.every(user => typeof Data.Watchlist[user] != 'undefined')) {
+				msg.channel.send('**Here is the requested information**');
+				const Watchlist = Data.Watchlist;
+
+				// Makes information easier to read
 				for (let i = 0; i < args.length; i++) {
 					msg.channel.send('name : ' + functions.userToString(args[i], msg));
-					const diff = Date.now() - Data.Watchlist[args[i]].time;
-					const minutes = Math.floor((diff / 1000) / 60);
-					const Watchlist = Data.Watchlist;
-					Watchlist[args[i]].time = minutes;
+					Watchlist[args[i]].time = functions.minutesSince(Date.now, Data.Watchlist[args[i]].time);
 					let list = JSON.stringify(Watchlist[args[i]]);
 					for (let x = 0; x < Exp.length; x++) {
 						list = list.replace(Exp[x], repl[x]);
@@ -37,6 +42,8 @@ module.exports = {
 				return;
 			}
 		}
+
+		// Resets user's infractions
 		else if (args[0] == 'reset' || args[0] == 'r') {
 			args.shift();
 			for (let i = 0; i < args.length; i++) {
@@ -47,7 +54,7 @@ module.exports = {
 			return;
 		}
 		else {
-			msg.channel.send('Please specify a function, "--mod info <user>" for information on a user and "--mod reset <user>" to reset a user\'s infractions');
+			msg.channel.send('Please specify a function, "&mod info <user>" for information on a user and "&mod reset <user>" to reset a user\'s infractions');
 		}
 	},
 };

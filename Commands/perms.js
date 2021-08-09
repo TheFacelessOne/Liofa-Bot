@@ -8,7 +8,7 @@ module.exports = {
 	description: 'Changes command permissions',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		// If you're asking for the list of all perms
+		// Lists all permissions
 		if (args[0] == 'list') {
 			for (const [value] of Object.entries(Data.Permissions)) {
 				for (let i = Data.Permissions[value].length; i > 0; i--) {
