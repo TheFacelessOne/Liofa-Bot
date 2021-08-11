@@ -21,6 +21,7 @@ Input | Function
 `&reset` | Brings Liofa's Settings back to the default settings
 `&mod` | Moderator commands
 `&whitelist` | Whitelists words to ignore
+`&settings` | Edit various settings for Liofa
 
   
 
@@ -33,13 +34,17 @@ I would appreciate any and all help with translations. I only speak English myse
 ## To Do List
 
 - Add in configurable settings per server for
-	- [ ] Time
-	- [ ] Warning count
-	- [ ] Acceptable Language(s)
+	- [x] Time
+	- [x] Warning count
+	- [x] Acceptable Language(s)
+	- [x] Prefixes
+	- [x] Whitelisted words
+	- [ ] Ignored Channels
+	- [ ] Responses
 
 - Planned Commands
 	- [x] Remove warnings
-	- [ ] Change Settings
+	- [x] Change Settings
 	- [x] Change Permissions
 	- [x] Reset all settings
 	- [ ] Help command

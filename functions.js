@@ -1,4 +1,13 @@
-module.exports = { roleToString, roleToID, userToString, userToID, removeFromString, liofaCheck, minutesSince };
+module.exports = {
+	roleToString,
+	roleToID,
+	userToString,
+	userToID,
+	removeFromString,
+	liofaCheck,
+	minutesSince,
+	minsToMilli,
+	arrayToggle };
 const cld = require('cld');
 
 // Check for Language
@@ -26,7 +35,13 @@ function roleToString(identifier, msg) {
 function roleToID(identifier, msg) {
 	// eslint-disable-next-line no-useless-escape
 	const exp = new RegExp(/^\<\@\&\d{15,}\>$/);
-	if (!isNaN(identifier)) {
+	if (typeof identifier == 'object') {
+		for (let i = 0; i < identifier.length; i++) {
+			identifier[i] = roleToID(identifier[i], msg);
+		}
+		return identifier;
+	}
+	else if (!isNaN(identifier)) {
 		return identifier;
 	}
 	else if (identifier.match(exp)) {
@@ -90,4 +105,21 @@ function removeFromString(arr, str) {
 function minutesSince(bigTime, littleTime) {
 	const diff = bigTime - littleTime;
 	return Math.floor((diff / 1000) / 60);
+}
+
+// Converts milliseconds into minutes
+function minsToMilli(minutes) {
+	return minutes * 60000;
+}
+
+// Adds to array if the input doesn't exist, removes from array if it doesn't
+function arrayToggle(list, input) {
+	if (list.includes(input)) {
+		const index = list.indexOf(input);
+		list.splice(index, 1);
+	}
+	else {
+		list.push(input);
+	}
+	return list;
 }

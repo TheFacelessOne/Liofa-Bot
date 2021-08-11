@@ -8,14 +8,14 @@ module.exports = {
 	description: 'toggles Liofa',
 	execute(msg) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		if (typeof Data.Settings.State == 'boolean') {
-			Data.Settings.State = !Data.Settings.State;
+		if (typeof Data.Settings.state == 'boolean') {
+			Data.Settings.state = !Data.Settings.state;
 		}
 		else {
-			Data.Settings.State = true;
+			Data.Settings.state = true;
 		}
 		const Update = JSON.stringify(Data, null, 2);
 		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', Update);
-		msg.channel.send('Liofa is turned ' + Response[Data.Settings.State]);
+		msg.channel.send('Liofa is turned ' + Response[Data.Settings.state]);
 	},
 };

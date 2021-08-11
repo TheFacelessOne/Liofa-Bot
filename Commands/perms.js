@@ -34,22 +34,20 @@ module.exports = {
 		}
 		// Used for toggling what roles can use what commands
 		else {
-			for (let i = args.length - 1; i > 0; i--) {
-				if (isNaN(args[i])) {
-					args[i] = functions.roleToID(args[i], msg);
-				}
-				if (!msg.guild.roles.cache.has(args[i])) {
-					msg.channel.send('One or more of the given roles do not exist');
-					return;
-				}
-				else if (Data.Permissions[args[0]].includes(args[i])) {
-					const index = Data.Permissions[args[0]].indexOf(args[i]);
-					Data.Permissions[args[0]].splice(index, 1);
-					msg.channel.send(functions.roleToString(args[i], msg) + ' removed from ' + args[0]);
+			const perm = args.shift();
+			args = functions.roleToID(args);
+			if (!args.every(role => msg.guild.roles.cache.has(role))) {
+				msg.channel.send('One or more of the given roles do not exist');
+				return;
+			}
+			for (let i = 0; i < args.length; i++) {
+				const permLength = Data.Permissions[perm].length;
+				Data.Permissions[perm] = functions.arrayToggle(Data.Permissions[perm], args[i]);
+				if (permLength > Data.Permissions[perm].length) {
+					msg.channel.send(functions.roleToString(args[i], msg) + ' removed from ' + perm);
 				}
 				else {
-					Data.Permissions[args[0]].push(args[i]);
-					msg.channel.send(functions.roleToString(args[i], msg) + ' added to ' + args[0]);
+					msg.channel.send(functions.roleToString(args[i], msg) + ' added to ' + perm);
 				}
 			}
 

@@ -33,14 +33,17 @@ client.on('message', messageRec);
 
 // Start-up process
 client.once('ready', () => {
-	for (const server in LiofaData) {
-		versionCheck(server);
-	}
+	client.guilds.cache.forEach(guild => versionCheck(guild));
 	console.log('Líofa is Talking!');
 });
 
 // Checks if Server Data files are in the correct format
 function versionCheck(server) {
+	if (typeof LiofaData[server.id] == 'undefined') {
+		liofaJoin(server);
+		return;
+	}
+	server = server.id;
 	// Checks Server version against Default Settings version
 	if (LiofaData[server].Version != readSettings.Version) {
 
@@ -73,7 +76,7 @@ function liofaJoin(Server) {
 		return;
 	}
 	// Creates file and adds it to LiofaData
-	fs.writeFileSync(FileAddress, readSettings);
+	fs.writeFileSync(FileAddress, JSON.stringify(readSettings, null, 2));
 	LiofaData[Server.id] = JSON.parse(fs.readFileSync(FileAddress));
 	console.log('Joined new server ' + Server.id.toString());
 }
@@ -88,32 +91,32 @@ async function messageRec(msg) {
 
 	try {
 		// Removes whitelisted words from the message
-		const MessageContent = functions.removeFromString(LiofaData[msg.guild.id].Settings.Whitelist, msg.content);
+		const MessageContent = functions.removeFromString(LiofaData[msg.guild.id].Settings.whitelist, msg.content);
 
 		// Asks what the language is
 		const result = await functions.liofaCheck(MessageContent);
 
 
 		// Responds if it is not listed as an acceptable language
-		if (result.code != 'en' && result.code != 'sco' && result.code != 'ie') {
+		if (!LiofaData[msg.guild.id].Settings.languages.includes(result.code)) {
 
 			// Warnings Check
 			const warnCount = liofaMod(msg.guild.id, msg.author.id);
-			if (warnCount < 3) {
+			if (warnCount < LiofaData[msg.guild.id].Settings.warnings) {
 
 				// Checks if output for given language is available
 				if (typeof LiofaMessages[result.code] === 'string') {
-					msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%]`');
+					msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%] code: [' + result.code + ']`');
 				}
 				else {
 					msg.reply('**Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
-					msg.channel.send(result.name + ' must be added to Languages `[' + result.code + ']`');
+					msg.channel.send(result.name + ' must be added to Languages. code: `[' + result.code + ']`');
 				}
 			}
-			else if (warnCount == 3) {
+			else if (warnCount == LiofaData[msg.guild.id].Settings.warnings) {
 				msg.reply('All further messages will be deleted unless you speak in English');
 			}
-			else if (warnCount > 3) {
+			else if (warnCount > LiofaData[msg.guild.id].Settings.warnings) {
 				msg.delete();
 			}
 		}
@@ -125,14 +128,14 @@ async function messageRec(msg) {
 }
 
 // Checks if Liofa should run
-function runLiofa(msg2) {
+function runLiofa(msg) {
 	// Checks if it's a Bot
-	if (msg2.author.bot === true) {
+	if (msg.author.bot === true) {
 		return false;
 	}
 	// Checks if it's a command
-	else if (msg2.content.includes('&') && msg2.content.search('&') == 0) {
-		const args = msg2.content.slice(1).trim().split(' ');
+	else if (msg.content.includes(LiofaData[msg.guild.id].Settings.prefix) && msg.content.search(LiofaData[msg.guild.id].Settings.prefix) == 0) {
+		const args = msg.content.slice(LiofaData[msg.guild.id].Settings.prefix.length).trim().split(' ');
 		const command = args.shift().toLowerCase();
 
 		// Checks command exists
@@ -142,26 +145,26 @@ function runLiofa(msg2) {
 
 		try {
 			// Checks you have permission to run the command
-			if (!msg2.member.hasPermission('ADMINISTRATOR') && !msg2.member.roles.cache.some(role => LiofaData[msg2.guild.id]['Permissions'][command].includes(role.id))) {
-				msg2.reply(' has insufficient permissions');
+			if (!msg.member.hasPermission('ADMINISTRATOR') && !msg.member.roles.cache.some(role => LiofaData[msg.guild.id]['Permissions'][command].includes(role.id))) {
+				msg.reply(' has insufficient permissions');
 				return false;
 			}
 			// Executes the command and updates LiofaData
-			client.commands.get(command).execute(msg2, args);
-			LiofaData[msg2.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg2.guild.id + '.json'));
+			client.commands.get(command).execute(msg, args);
+			LiofaData[msg.guild.id] = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 			return false;
 		}
 		catch (error) {
 			console.error(error);
-			msg2.reply('something went wrong');
+			msg.reply('something went wrong');
 		}
 	}
 	// Checks if they have a role from the excluded roles list
-	else if (msg2.member.roles.cache.some(ExcludedRole => LiofaData[msg2.guild.id].Permissions.excluded.includes(ExcludedRole.id))) {
+	else if (msg.member.roles.cache.some(ExcludedRole => LiofaData[msg.guild.id].Permissions.excluded.includes(ExcludedRole.id))) {
 		return false;
 	}
 	// Returns whether Liofa is turned on for this server or not
-	return LiofaData[msg2.guild.id].Settings.State;
+	return LiofaData[msg.guild.id].Settings.state;
 }
 
 // Check Warning Status
@@ -172,7 +175,7 @@ function liofaMod(ServerID, UserID) {
 		UserRef = { warnings : 1, time : Date.now() };
 	}
 
-	else if ((Date.now() - UserRef.time) < 1800000) {
+	else if ((Date.now() - UserRef.time) < LiofaData[ServerID].Settings.time) {
 		UserRef.warnings++;
 		UserRef.time = Date.now();
 

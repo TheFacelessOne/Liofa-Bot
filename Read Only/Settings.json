@@ -1,9 +1,17 @@
 {
-    "Version" : "1.6.1",
-    "Watchlist": {},
+    "Version" : "1.7.0",
     "Settings": {
-      "State": true,
-      "Whitelist": []
+      "state": true,
+      "whitelist": [],
+      "languages": [      
+        "en",
+        "sco",
+        "ie"
+      ],
+      "time": 1800000,
+      "warnings": 3,
+      "channels": [],
+      "prefix": "&"
     },
     "Permissions": {
       "toggle": [],
@@ -11,6 +19,8 @@
       "reset": [],
       "mod": [],
       "excluded": [],
-      "whitelist": []
-    }
+      "whitelist": [],
+      "settings": []
+    },
+    "Watchlist": {}
   }

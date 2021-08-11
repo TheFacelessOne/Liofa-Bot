@@ -8,7 +8,7 @@ module.exports = {
 		// If you're asking for the list of all whitelisted words and phrases
 		if (args[0] == 'list') {
 			let list = '[';
-			Data.Settings.Whitelist.forEach(element => list = list + element + '], [');
+			Data.Settings.whitelist.forEach(element => list = list + element + '], [');
 			list = list.slice(0, -3);
 			msg.channel.send('**Whitelisted Words:**');
 			msg.channel.send(list);
@@ -21,22 +21,22 @@ module.exports = {
 				msg.channel.send('No words given, please provide one or more words to add to the whitelist');
 				return;
 			}
-			else if (args.some(element => Data.Settings.Whitelist.includes(element))) {
+			else if (args.some(element => Data.Settings.whitelist.includes(element))) {
 				msg.channel.send('One or more words already exist in the whitelist, use "&whitelist list" to list all whitelisted words');
 				return;
 			}
 			else {
-				args.forEach(element => Data.Settings.Whitelist.push(element));
+				args.forEach(element => Data.Settings.whitelist.push(element));
 				msg.channel.send('Whitelist updated');
 			}
 		}
 		// Remove words or phrases from the whitelist
 		else if (args[0] == 'remove' || args[0] == 'r') {
 			args.shift();
-			if (args.every(element => Data.Settings.Whitelist.includes(element))) {
+			if (args.every(element => Data.Settings.whitelist.includes(element))) {
 				for (let i = 0; i < args.length; i++) {
-					const index = Data.Settings.Whitelist.indexOf(args[i]);
-					Data.Settings.Whitelist.splice(index, 1);
+					const index = Data.Settings.whitelist.indexOf(args[i]);
+					Data.Settings.whitelist.splice(index, 1);
 				}
 				msg.channel.send('Whitelist updated');
 			}
