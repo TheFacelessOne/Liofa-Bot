@@ -15,7 +15,8 @@ module.exports = {
 				'\n**Languages contains: **' + Data.Settings.languages.length + ' acceptable languages' +
 				'\n**Time until past infractions are ignored: ** ' + Math.floor((Data.Settings.time / 1000) / 60) + ' minutes' +
 				'\n**Maximum warnings given: **' + Data.Settings.warnings +
-				'\n**Ignored channels contains: **' + Data.Settings.channels.length + ' channels' +
+				'\n**Whitelisted channels contains: **' + Data.Settings.channels.length + ' channels' +
+				'\n**Ignored channel keywords contains: **' + Data.Settings.channelIgnore.length + ' entries' +
 				'\n**Commands prefix: ** "' + Data.Settings.prefix + '"');
 				let list = '';
 				for (const entry in Data.Settings) {
@@ -26,7 +27,7 @@ module.exports = {
 				msg.channel.send('for more information on a setting, do "' + Data.Settings.prefix.toString() + 'settings list <option>" \n The options available to you are ' + list);
 				return;
 			}
-			else if (typeof Data.Settings[args[0].toLowerCase()] === 'object') {
+			else if (typeof Data.Settings[args[0]] === 'object') {
 				args[0] = args[0].toLowerCase();
 				msg.channel.send('**' + args[0] + ' contains:**');
 				if (Data.Settings[args[0]].length != 0) {

@@ -39,7 +39,7 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [x] Acceptable Language(s)
 	- [x] Prefixes
 	- [x] Whitelisted words
-	- [ ] Ignored Channels
+	- [x] Ignored Channels
 	- [ ] Responses
 
 - Planned Commands
@@ -51,7 +51,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [x] Add configurable roles that are excluded
 
-- [ ] Add configurable channels that are ignored
+- [x] Add configurable channels that are ignored
 
 -  [x] Permissions system
 

@@ -4,6 +4,7 @@ module.exports = {
 	name: 'reset',
 	description: 'Reset all settings',
 	execute(msg, args) {
+		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		const FileAddress = 'Server Data/' + msg.guild.id + '.json';
 		const tempSettings = JSON.parse(fs.readFileSync('Read Only/Settings.json'));
 
