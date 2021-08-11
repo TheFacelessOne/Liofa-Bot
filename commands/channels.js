@@ -3,7 +3,8 @@ const functions = require('../functions.js');
 
 module.exports = {
 	name: 'channels',
-	description: 'Adds specific channels or channels that contain certain words to the ignored channels list',
+	description: 'Used for specifying channels for Liofa to ignore',
+	usage: '[whitelist <channel(s)> | ignore <keywords to ignore> | list]',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		// If you're asking for the list of all whitelisted channels

@@ -1,6 +1,9 @@
 # Liofa Bot
 
-A Discord Bot for dealing with people speaking other languages
+### A Discord Bot for dealing with people speaking other languages
+### [Invite Link](https://discord.com/api/oauth2/authorize?client_id=866186816645890078&permissions=76800&scope=bot)
+### [Support Server](https://discord.gg/ay7uzuHctN)
+### [Github](https://github.com/TheFacelessOne/Liofa-Bot)
 
   
 
@@ -16,6 +19,7 @@ A Discord Bot for dealing with people speaking other languages
 
 Input | Function
 ------------|--------------------
+`&help` | Provides information about commands
 `&toggle` | Toggles Liofa
 `&perms` | Toggles permissions per role
 `&reset` | Brings Liofa's Settings back to the default settings
@@ -35,7 +39,8 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - Add in configurable settings per server for
 	- [x] Time
-	- [x] Warning count
+	- [ ] Warning count start
+	- [x] Warning count end
 	- [x] Acceptable Language(s)
 	- [x] Prefixes
 	- [x] Whitelisted words
@@ -47,7 +52,7 @@ I would appreciate any and all help with translations. I only speak English myse
 	- [x] Change Settings
 	- [x] Change Permissions
 	- [x] Reset all settings
-	- [ ] Help command
+	- [x] Help command
 
 - [x] Add configurable roles that are excluded
 

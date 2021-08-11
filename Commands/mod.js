@@ -5,7 +5,8 @@ const repl = ['', '', ' : ', ', ', '', ''];
 
 module.exports = {
 	name: 'mod',
-	description: 'moderator commands',
+	description: 'Commands to allow moderators to view or edit member\'s infractions',
+	usage: '[info <user> | reset <user>]',
 	execute(msg, args) {
 		// Reads file for given server
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));

@@ -2,7 +2,7 @@ const fs = require('fs');
 
 module.exports = {
 	name: 'reset',
-	description: 'Reset all settings',
+	description: 'Reset all server settings to default',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		const FileAddress = 'Server Data/' + msg.guild.id + '.json';

@@ -1,5 +1,5 @@
 {
-    "Version" : "1.8.0",
+    "Version" : "1.9.1",
     "Settings": {
       "state": true,
       "whitelist": [],
@@ -22,7 +22,8 @@
       "excluded": [],
       "whitelist": [],
       "settings": [],
-      "channels": []
+      "channels": [],
+      "help": []
     },
     "Watchlist": {}
   }

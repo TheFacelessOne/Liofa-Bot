@@ -3,6 +3,7 @@ const fs = require('fs');
 module.exports = {
 	name: 'whitelist',
 	description: 'Adds words to Liofa\'s ignored words list',
+	usage: '[list | add <word> | remove <word> ]',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		// If you're asking for the list of all whitelisted words and phrases
@@ -44,6 +45,9 @@ module.exports = {
 				msg.channel.send('One or more words do not exist in the whitelist, use "' + Data.Settings.prefix + 'whitelist list" to list all whitelisted words');
 				return;
 			}
+		}
+		else {
+			msg.channel.send('No accepted arguments given, \nAccepted arguments include "list, add, remove"');
 		}
 		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', JSON.stringify(Data, null, 2));
 		console.log(msg.guild.id.toString() + ' JSON updated');

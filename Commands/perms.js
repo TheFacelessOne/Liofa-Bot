@@ -5,7 +5,8 @@ const repl = ['', '\n', '', '', '', ' : ', ', ', '', ''];
 
 module.exports = {
 	name: 'perms',
-	description: 'Changes command permissions',
+	description: 'Toggles what roles can use what commands',
+	usage: '[<permission name> <role(s)> | list]',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		// Lists all permissions

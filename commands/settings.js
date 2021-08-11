@@ -3,7 +3,8 @@ const functions = require('../functions.js');
 
 module.exports = {
 	name: 'settings',
-	description: 'Changes Settings for liofa',
+	description: 'View and edit certain settings',
+	usage: '[list [option] | prefix <new prefix> | languages <language code> | time <minutes> | warnings <warning count>]',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		// Lists all settings
