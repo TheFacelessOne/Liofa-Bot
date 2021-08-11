@@ -20,7 +20,7 @@ module.exports = {
 
 			// Asks for confirmation
 			else {
-				msg.channel.send('please confirm you wish to reset all server files with "&reset yes"');
+				msg.channel.send('please confirm you wish to reset all server files with "' + Data.Settings.prefix + 'reset yes"');
 				return;
 			}
 		}

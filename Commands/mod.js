@@ -54,7 +54,7 @@ module.exports = {
 			return;
 		}
 		else {
-			msg.channel.send('Please specify a function, "&mod info <user>" for information on a user and "&mod reset <user>" to reset a user\'s infractions');
+			msg.channel.send('Please specify a function, "' + Data.Settings.prefix + 'mod info <user>" for information on a user and "' + Data.Settings.prefix + 'mod reset <user>" to reset a user\'s infractions');
 		}
 	},
 };

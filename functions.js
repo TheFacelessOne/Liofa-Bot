@@ -3,6 +3,8 @@ module.exports = {
 	roleToID,
 	userToString,
 	userToID,
+	channelToString,
+	channelToID,
 	removeFromString,
 	liofaCheck,
 	minutesSince,
@@ -89,10 +91,49 @@ function userToID(identifier, msg) {
 	}
 	else {
 		msg.channel.send('Something went wrong converting the username. Maybe try using the user ID instead');
-		console.log('User mention to ID conversion failure');
-		console.log('guild name : ' + msg.guild.id + ' guild id : ' + msg.guild.name + ' message : ' + msg.content);
 		return undefined;
 	}
+}
+
+// Converts Channels IDs to their Name
+function channelToString(identifier, msg) {
+	if (!isNaN(identifier) && msg.guild.channels.cache.has(identifier)) {
+		const LookUpChannel = msg.guild.channels.cache.find(channel => channel.id === identifier);
+		return LookUpChannel.name;
+	}
+	else if (typeof identifier == 'string') {
+		return identifier;
+	}
+	else {
+		return 'Unknown Channel';
+	}
+}
+
+// Converts Channel mentions to their ID
+function channelToID(identifier, msg) {
+	// eslint-disable-next-line no-useless-escape
+	const exp1 = new RegExp(/^\<\#\d{10,}\>$/);
+	if (typeof identifier == 'object') {
+		for (let i = 0; i < identifier.length; i++) {
+			identifier[i] = channelToID(identifier[i], msg);
+		}
+		return identifier;
+	}
+	if (!isNaN(identifier)) {
+		return identifier;
+	}
+	else if (identifier.match(exp1)) {
+		while(isNaN(identifier.charAt(0))) {
+			identifier = identifier.substring(1);
+		}
+		identifier = identifier.substring(0, identifier.length - 1);
+		return identifier;
+	}
+	else {
+		msg.channel.send('Something went wrong converting the channel name. Maybe try using the channel ID instead');
+		return undefined;
+	}
+
 }
 
 // Removes an array of words from a string

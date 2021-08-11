@@ -22,7 +22,7 @@ module.exports = {
 				return;
 			}
 			else if (args.some(element => Data.Settings.whitelist.includes(element))) {
-				msg.channel.send('One or more words already exist in the whitelist, use "&whitelist list" to list all whitelisted words');
+				msg.channel.send('One or more words already exist in the whitelist, use "' + Data.Settings.prefix + 'whitelist list" to list all whitelisted words');
 				return;
 			}
 			else {
@@ -41,7 +41,7 @@ module.exports = {
 				msg.channel.send('Whitelist updated');
 			}
 			else {
-				msg.channel.send('One or more words do not exist in the whitelist, use "&whitelist list" to list all whitelisted words');
+				msg.channel.send('One or more words do not exist in the whitelist, use "' + Data.Settings.prefix + 'whitelist list" to list all whitelisted words');
 				return;
 			}
 		}

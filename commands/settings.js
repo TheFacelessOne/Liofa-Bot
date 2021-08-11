@@ -38,7 +38,7 @@ module.exports = {
 				return;
 			}
 			else {
-				msg.channel.send(args[0] + ' is not an accepted input for "&settings list"');
+				msg.channel.send(args[0] + ' is not an accepted input for "' + Data.Settings.prefix + 'settings list"');
 				return;
 			}
 		}

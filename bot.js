@@ -163,6 +163,12 @@ function runLiofa(msg) {
 	else if (msg.member.roles.cache.some(ExcludedRole => LiofaData[msg.guild.id].Permissions.excluded.includes(ExcludedRole.id))) {
 		return false;
 	}
+	else if (LiofaData[msg.guild.id].Settings.channels.includes(msg.channel.id)) {
+		return false;
+	}
+	else if (LiofaData[msg.guild.id].Settings.channelIgnore.some(ignore => msg.channel.name.includes(ignore))) {
+		return false;
+	}
 	// Returns whether Liofa is turned on for this server or not
 	return LiofaData[msg.guild.id].Settings.state;
 }
