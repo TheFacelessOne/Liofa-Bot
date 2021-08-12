@@ -60,6 +60,7 @@ function versionCheck(server) {
 				LiofaData[server].Version = readSettings.Version;
 			}
 		}
+		LiofaData[server]['Version'] = readSettings.Version;
 		// Updates Server Files
 		fs.writeFileSync('./Server Data/' + server + '.json', JSON.stringify(LiofaData[server], null, 2));
 		console.log(server + ' updated to ' + readSettings.Version);
@@ -91,8 +92,8 @@ async function messageRec(msg) {
 
 	try {
 		// Removes whitelisted words from the message
-		const MessageContent = functions.removeFromString(LiofaData[msg.guild.id].Settings.whitelist, msg.content);
-
+		let MessageContent = functions.removeEmojis(msg.content);
+		MessageContent = functions.removeFromString(LiofaData[msg.guild.id].Settings.whitelist, MessageContent);
 		// Asks what the language is
 		const result = await functions.liofaCheck(MessageContent);
 
@@ -123,6 +124,7 @@ async function messageRec(msg) {
 	}
 	// Returns error for when language cannot be detected
 	catch (err) {
+		console.log(err);
 		return;
 	}
 }

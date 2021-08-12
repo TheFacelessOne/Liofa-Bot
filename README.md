@@ -72,6 +72,8 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [x] Enable versions checking and automatic updating for each server's files
 
+- [x] Ignore emojis
+
   
 
 ##### About Liofa

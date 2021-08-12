@@ -6,6 +6,7 @@ module.exports = {
 	channelToString,
 	channelToID,
 	removeFromString,
+	removeEmojis,
 	liofaCheck,
 	minutesSince,
 	minsToMilli,
@@ -140,6 +141,12 @@ function channelToID(identifier, msg) {
 function removeFromString(arr, str) {
 	const regex = new RegExp('\\b' + arr.join('|') + '\\b', 'gi');
 	return str.replace(regex, '');
+}
+
+function removeEmojis(msg) {
+	// eslint-disable-next-line no-useless-escape
+	const regex = new RegExp('\<a?\:[^ \>]+\>', 'g');
+	return msg.replaceAll(regex, '');
 }
 
 // Given two times, gives you the difference between them in minutes
