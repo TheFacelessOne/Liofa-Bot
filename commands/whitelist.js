@@ -11,8 +11,7 @@ module.exports = {
 			let list = '[';
 			Data.Settings.whitelist.forEach(element => list = list + element + '], [');
 			list = list.slice(0, -3);
-			msg.channel.send('**Whitelisted Words:**');
-			msg.channel.send(list);
+			msg.channel.send('**Whitelisted Words:**\n' + list);
 			return;
 		}
 		// if you're adding a word or phrase

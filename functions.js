@@ -139,14 +139,14 @@ function channelToID(identifier, msg) {
 
 // Removes an array of words from a string
 function removeFromString(arr, str) {
-	const regex = new RegExp('\\b' + arr.join('|') + '\\b', 'gi');
-	return str.replace(regex, '');
+	const regex = new RegExp(arr.join('|'), 'gi');
+	return str.replace(regex, ' ');
 }
 
 function removeEmojis(msg) {
 	// eslint-disable-next-line no-useless-escape
 	const regex = new RegExp('\<a?\:[^ \>]+\>', 'g');
-	return msg.replaceAll(regex, '');
+	return msg.replaceAll(regex, ' ');
 }
 
 // Given two times, gives you the difference between them in minutes
