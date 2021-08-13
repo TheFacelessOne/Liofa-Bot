@@ -4,7 +4,7 @@ const functions = require('../functions.js');
 module.exports = {
 	name: 'settings',
 	description: 'View and edit certain settings',
-	usage: '[list [option] | prefix <new prefix> | languages <language code> | time <minutes> | warnings <warning count>]',
+	usage: '[list [option] | prefix <new prefix> | languages <language code> | time <minutes> | warnings <warning count> | startwarnings <allowed messages>]',
 	execute(msg, args) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		// Lists all settings
@@ -15,6 +15,7 @@ module.exports = {
 				'\n**Whitelist contains: **' + Data.Settings.whitelist.length + ' entries' +
 				'\n**Languages contains: **' + Data.Settings.languages.length + ' acceptable languages' +
 				'\n**Time until past infractions are ignored: ** ' + Math.floor((Data.Settings.time / 1000) / 60) + ' minutes' +
+				'\n**Messages allowed before warnings are given: **' + Data.Settings.startwarnings +
 				'\n**Maximum warnings given: **' + Data.Settings.warnings +
 				'\n**Whitelisted channels contains: **' + Data.Settings.channels.length + ' channels' +
 				'\n**Ignored channel keywords contains: **' + Data.Settings.channelIgnore.length + ' entries' +
@@ -96,8 +97,21 @@ module.exports = {
 				msg.channel.send(args[0] + ' warnings will be given before a user\'s messages are deleted');
 			}
 		}
+		// Messages before warnings are given
+		else if (args[0] == 'startwarnings') {
+			args.shift();
+			if (isNaN(args[0])) {
+				msg.channel.send('Please provide a number of messages to be allowed before a warning is given');
+				return;
+			}
+			else {
+				Data.Settings.startwarnings = args[0];
+				msg.channel.send(args[0] + ' messages will be allowed before a warning is given');
+			}
+
+		}
 		else {
-			msg.channel.send('No acceptable arguments were given. \n Acceptable arguments include "list, prefix, languages, time, warnings"');
+			msg.channel.send('No acceptable arguments were given. \n Acceptable arguments include "list, prefix, languages, time, warnings, startwarnings"');
 		}
 		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', JSON.stringify(Data, null, 2));
 		console.log(msg.guild.id.toString() + ' JSON updated');

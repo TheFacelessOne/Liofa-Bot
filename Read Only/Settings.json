@@ -1,5 +1,5 @@
 {
-    "Version" : "1.9.1",
+    "Version" : "1.9.2",
     "Settings": {
       "state": true,
       "whitelist": [],
@@ -9,6 +9,7 @@
         "ie"
       ],
       "time": 1800000,
+      "startwarnings": 0,
       "warnings": 3,
       "channels": [],
       "channelIgnore": [],

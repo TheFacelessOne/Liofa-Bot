@@ -39,7 +39,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - Add in configurable settings per server for
 	- [x] Time
-	- [ ] Warning count start
+	- [x] Warning count start
 	- [x] Warning count end
 	- [x] Acceptable Language(s)
 	- [x] Prefixes

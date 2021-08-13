@@ -103,7 +103,8 @@ async function messageRec(msg) {
 
 			// Warnings Check
 			const warnCount = liofaMod(msg.guild.id, msg.author.id);
-			if (warnCount < LiofaData[msg.guild.id].Settings.warnings) {
+			const msgBeforeDeletion = parseInt(LiofaData[msg.guild.id].Settings.warnings) + parseInt(LiofaData[msg.guild.id].Settings.startwarnings);
+			if (warnCount < msgBeforeDeletion && warnCount > LiofaData[msg.guild.id].Settings.startwarnings) {
 
 				// Checks if output for given language is available
 				if (typeof LiofaMessages[result.code] === 'string') {
@@ -114,10 +115,10 @@ async function messageRec(msg) {
 					msg.channel.send(result.name + ' must be added to Languages. code: `[' + result.code + ']`');
 				}
 			}
-			else if (warnCount == LiofaData[msg.guild.id].Settings.warnings) {
+			else if (warnCount == msgBeforeDeletion) {
 				msg.reply('All further messages will be deleted unless you speak in English');
 			}
-			else if (warnCount > LiofaData[msg.guild.id].Settings.warnings) {
+			else if (warnCount > msgBeforeDeletion) {
 				msg.delete();
 			}
 		}
