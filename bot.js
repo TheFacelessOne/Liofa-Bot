@@ -125,6 +125,7 @@ async function messageRec(msg) {
 	}
 	// Returns error for when language cannot be detected
 	catch (err) {
+		console.log(msg.content);
 		console.log(err);
 		return;
 	}
