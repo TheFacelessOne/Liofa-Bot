@@ -19,13 +19,14 @@
 
 Input | Function
 ------------|--------------------
+`&channels` | Allows ignoring specific channels or ignoring all channels based on a keyword
 `&help` | Provides information about commands
-`&toggle` | Toggles Liofa
+`&mod` | Moderator commands
 `&perms` | Toggles permissions per role
 `&reset` | Brings Liofa's Settings back to the default settings
-`&mod` | Moderator commands
-`&whitelist` | Whitelists words to ignore
 `&settings` | Edit various settings for Liofa
+`&toggle` | Turns Liofa on/off
+`&whitelist` | Whitelists words to ignore
 
   
 
