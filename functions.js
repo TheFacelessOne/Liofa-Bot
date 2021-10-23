@@ -10,8 +10,15 @@ module.exports = {
 	liofaCheck,
 	minutesSince,
 	minsToMilli,
-	arrayToggle };
+	arrayToggle,
+	liofaRead,
+	liofaFilter,
+	liofaJoin,
+	liofaPrefixCheck,
+	liofaPermsCheck,
+	liofaExcludedRolesOrChannels };
 const cld = require('cld');
+const fs = require('fs');
 
 // Check for Language
 async function liofaCheck(msg) {
@@ -139,14 +146,19 @@ function channelToID(identifier, msg) {
 
 // Removes an array of words from a string
 function removeFromString(arr, str) {
-	const regex = new RegExp(arr.join('|'), 'gi');
-	return str.replace(regex, ' ');
+	if (arr.length > 0) {
+		const regex = new RegExp(arr.join('|'), 'gi');
+		return str.replace(regex, ' ');
+	}
+	else {
+		return str;
+	}
 }
 
 function removeEmojis(msg) {
 	// eslint-disable-next-line no-useless-escape
 	const regex = new RegExp('\<a?\:[^ \>]+\>', 'g');
-	return msg.replaceAll(regex, ' ');
+	return msg.replace(regex, ' ');
 }
 
 // Given two times, gives you the difference between them in minutes
@@ -160,7 +172,7 @@ function minsToMilli(minutes) {
 	return minutes * 60000;
 }
 
-// Adds to array if the input doesn't exist, removes from array if it doesn't
+// Adds to array if the input doesn't exist, removes from array if it does
 function arrayToggle(list, input) {
 	if (list.includes(input)) {
 		const index = list.indexOf(input);
@@ -170,4 +182,49 @@ function arrayToggle(list, input) {
 		list.push(input);
 	}
 	return list;
+}
+
+function liofaRead(server) {
+	return JSON.parse(fs.readFileSync('./Server Data/' + server + '.json'));
+}
+
+function liofaFilter(msg) {
+	let MessageContent = removeEmojis(msg.content);
+	MessageContent = removeFromString(liofaRead(msg.guild.id).Settings.whitelist, MessageContent);
+	if (!/\S/.test(MessageContent)) {
+		return false;
+	}
+	else {
+		return MessageContent;
+	}
+}
+
+function liofaJoin(newServer) {
+	const newServerFile = '../Server Data/' + newServer.id + '.json';
+	if (fs.existsSync(newServerFile)) {
+		return;
+	}
+	fs.copyFileSync('../Read Only/Settings.json', newServerFile);
+	console.log('Joined new server ' + newServer.id.toString());
+}
+
+function liofaPrefixCheck(msg) {
+	if (msg.type === 'APPLICATION_COMMAND') return false;
+	const GuildData = liofaRead(msg.guild.id);
+	return msg.cleanContent.includes(GuildData.Settings.prefix) && msg.cleanContent.search(GuildData.Settings.prefix) == 0;
+}
+
+function liofaPermsCheck(msg, command) {
+	const GuildData = liofaRead(msg.guild.id);
+	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
+	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command].includes(role.id));
+	return isAdmin || hasPerms;
+}
+
+function liofaExcludedRolesOrChannels(msg) {
+	const GuildData = liofaRead(msg.guild.id);
+	const roleIsExcluded = msg.member.roles.cache.some(ExcludedRole => GuildData.Permissions.excluded.includes(ExcludedRole.id));
+	const channelIsExcluded = GuildData.Settings.channels.includes(msg.channel.id);
+	const channelNameIsIgnored = GuildData.Settings.channelIgnore.some(ignore => msg.channel.name.includes(ignore));
+	return roleIsExcluded || channelIsExcluded || channelNameIsIgnored;
 }

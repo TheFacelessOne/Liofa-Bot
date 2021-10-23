@@ -1,61 +1,69 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const functions = require('../functions.js');
 const Exp = [new RegExp('{'), new RegExp('"', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
 const repl = ['', '', ' : ', ', ', '', ''];
 
 module.exports = {
-	name: 'mod',
-	description: 'Commands to allow moderators to view or edit member\'s infractions',
-	usage: '[info <user> | reset <user>]',
-	execute(msg, args) {
-		// Reads file for given server
-		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
+	data : new SlashCommandBuilder()
+		.setName('mod')
+		.setDescription('View or remove infractions')
+		.addSubcommand(subcommand =>
+			subcommand.setName('info').setDescription('Find info on a user')
+				.addUserOption(User => User
+					.setName('user')
+					.setDescription('User to find information on')
+					.setRequired(true)))
+		.addSubcommand(subcommand =>
+			subcommand.setName('reset').setDescription('Reset a user\'s infractions')
+				.addUserOption(User => User
+					.setName('user')
+					.setDescription('Target User')
+					.setRequired(true))),
 
-		// Converts all given users to their IDs
-		for (let i = 1; i < args.length; i++) {
-			args[i] = functions.userToID(args[i], msg);
+	async execute(interaction) {
+		let target;
+		let subComm;
+		if (functions.liofaPrefixCheck(interaction)) {
+			const args = interaction.content.split(' ');
+			target = { id : functions.userToID(args[2], interaction), username : functions.userToString(functions.userToID(args[2], interaction), interaction) };
+			subComm = args[1];
+		}
+		else {
+			target = interaction.options.getUser('user');
+			subComm = interaction.options.getSubcommand();
 		}
 
-		// Gives info on listed users
-		if (args[0] == 'info' || args[0] == 'i') {
-			args.shift();
 
-			// Checks listed users exist on the watchlist
-			if (args.every(user => typeof Data.Watchlist[user] != 'undefined')) {
-				msg.channel.send('**Here is the requested information**');
-				const Watchlist = Data.Watchlist;
+		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
 
-				// Makes information easier to read
-				for (let i = 0; i < args.length; i++) {
-					msg.channel.send('name : ' + functions.userToString(args[i], msg));
-					Watchlist[args[i]].time = functions.minutesSince(Date.now(), Data.Watchlist[args[i]].time);
-					let list = JSON.stringify(Watchlist[args[i]]);
-					for (let x = 0; x < Exp.length; x++) {
-						list = list.replace(Exp[x], repl[x]);
-					}
-					list = list + ' minutes since last infraction';
-					msg.channel.send(list);
-				}
+
+		if (subComm === 'info') {
+
+			if(GuildData.Watchlist[target.id] != 'undefined') {
+
+				let timeSinceLastInfraction = functions.minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
+				let list = JSON.stringify(GuildData.Watchlist[target.id]);
+				for (let x = 0; x < Exp.length; x++) list = list.replace(Exp[x], repl[x]);
+
+				timeSinceLastInfraction = '\n' + timeSinceLastInfraction + ' minutes since last infraction';
+				interaction.reply('name : ' + target.username + timeSinceLastInfraction);
 				return;
 			}
 			else {
-				msg.channel.send('One or more of the given users have 0 infractions or do not exist');
-				return;
+				interaction.reply(target.username + ' has 0 infractions');
 			}
 		}
-
-		// Resets user's infractions
-		else if (args[0] == 'reset' || args[0] == 'r') {
-			args.shift();
-			for (let i = 0; i < args.length; i++) {
-				Data.Watchlist[args[i]].warnings = 0;
-				msg.channel.send(functions.userToString(args[i], msg) + '\'s infractions have been reset');
-			}
-			fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', JSON.stringify(Data, null, 2));
+		else if (subComm === 'reset') {
+			GuildData.Watchlist[target.id].warnings = 0;
+			interaction.reply(target.username + '\'s infractions have been reset');
+			fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
 			return;
 		}
 		else {
-			msg.channel.send('Please specify a function, "' + Data.Settings.prefix + 'mod info <user>" for information on a user and "' + Data.Settings.prefix + 'mod reset <user>" to reset a user\'s infractions');
+			interaction.reply('Something went wrong! 😬');
+			return;
+
 		}
 	},
 };

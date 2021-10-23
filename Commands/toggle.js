@@ -1,12 +1,14 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const fs = require('fs');
 const Response = {};
 Response[true] = 'on';
 Response[false] = 'off';
 
 module.exports = {
-	name: 'toggle',
-	description: 'toggles Liofa',
-	execute(msg) {
+	data: new SlashCommandBuilder()
+		.setName('toggle')
+		.setDescription('toggles Liofa'),
+	async execute(msg) {
 		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
 		if (typeof Data.Settings.state == 'boolean') {
 			Data.Settings.state = !Data.Settings.state;
@@ -16,6 +18,6 @@ module.exports = {
 		}
 		const Update = JSON.stringify(Data, null, 2);
 		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', Update);
-		msg.channel.send('Liofa is turned ' + Response[Data.Settings.state]);
+		msg.reply({ content: 'Liofa is turned ' + Response[Data.Settings.state], ephemeral: false });
 	},
 };
