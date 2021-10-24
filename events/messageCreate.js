@@ -21,7 +21,7 @@ module.exports = {
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
 
-					const LiofaMessages = require('./Read Only/Responses');
+					const LiofaMessages = require('../Read Only/Responses');
 					// Checks if output for given language is available
 					if (typeof LiofaMessages[result.code] === 'string') {
 						msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%] code: [' + result.code + ']`');
@@ -42,7 +42,7 @@ module.exports = {
 		// Returns error for when language cannot be detected
 		catch (err) {
 			console.log(msg.content);
-			console.log('Probably failed to translate');
+			console.log(err);
 			return;
 		}
 
@@ -53,19 +53,18 @@ module.exports = {
 
 			if (functions.liofaPrefixCheck(txt)) {
 				const args = txt.content.slice(GuildData.Settings.prefix.length).trim().split(' ');
-				const command = args.shift().toLowerCase();
 
 				// Checks command exists
-				const client = txt.client;
-				if (!client.commands.has(command)) return true;
+				const command = txt.client.commands.get(args.shift().toLowerCase());
+				if (!command) return true;
 
 				try {
 					// Checks you have permission to run the command
 					if (functions.liofaPermsCheck(txt, command)) {
-						client.commands.get(command).execute(txt, args);
+						command.execute(txt);
 					}
 					else {
-						txt.reply('you have insufficient permissions 😬');
+						txt.reply('You have insufficient permissions 😬');
 					}
 					return false;
 				}

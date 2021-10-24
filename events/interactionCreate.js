@@ -1,3 +1,5 @@
+const functions = require('../functions.js');
+
 module.exports = {
 	name: 'interactionCreate',
 	execute(interaction) {
@@ -5,6 +7,7 @@ module.exports = {
 		const command = interaction.client.commands.get(interaction.commandName);
 
 		if (!command) return;
+		if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply('You have insufficient permissions 😬');
 
 		try {
 			command.execute(interaction);

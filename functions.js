@@ -201,9 +201,7 @@ function liofaFilter(msg) {
 
 function liofaJoin(newServer) {
 	const newServerFile = '../Server Data/' + newServer.id + '.json';
-	if (fs.existsSync(newServerFile)) {
-		return;
-	}
+	if (fs.existsSync(newServerFile)) return;
 	fs.copyFileSync('../Read Only/Settings.json', newServerFile);
 	console.log('Joined new server ' + newServer.id.toString());
 }
@@ -217,7 +215,7 @@ function liofaPrefixCheck(msg) {
 function liofaPermsCheck(msg, command) {
 	const GuildData = liofaRead(msg.guild.id);
 	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
-	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command].includes(role.id));
+	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
 	return isAdmin || hasPerms;
 }
 

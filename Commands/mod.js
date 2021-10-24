@@ -20,6 +20,7 @@ module.exports = {
 					.setName('user')
 					.setDescription('Target User')
 					.setRequired(true))),
+	usage: '[info <user> | reset <user>]',
 
 	async execute(interaction) {
 		let target;

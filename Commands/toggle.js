@@ -8,16 +8,16 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('toggle')
 		.setDescription('toggles Liofa'),
-	async execute(msg) {
-		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		if (typeof Data.Settings.state == 'boolean') {
-			Data.Settings.state = !Data.Settings.state;
+	async execute(interaction) {
+		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+		if (typeof GuildData.Settings.state == 'boolean') {
+			GuildData.Settings.state = !GuildData.Settings.state;
 		}
 		else {
-			Data.Settings.state = true;
+			GuildData.Settings.state = true;
 		}
-		const Update = JSON.stringify(Data, null, 2);
-		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', Update);
-		msg.reply({ content: 'Liofa is turned ' + Response[Data.Settings.state], ephemeral: false });
+		const Update = JSON.stringify(GuildData, null, 2);
+		fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', Update);
+		interaction.reply({ content: 'Liofa is turned ' + Response[GuildData.Settings.state], ephemeral: false });
 	},
 };
