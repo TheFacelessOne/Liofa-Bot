@@ -16,7 +16,9 @@ module.exports = {
 	liofaJoin,
 	liofaPrefixCheck,
 	liofaPermsCheck,
-	liofaExcludedRolesOrChannels };
+	liofaExcludedRolesOrChannels,
+	onlyOne,
+	liofaUpdate };
 const cld = require('cld');
 const fs = require('fs');
 
@@ -225,4 +227,20 @@ function liofaExcludedRolesOrChannels(msg) {
 	const channelIsExcluded = GuildData.Settings.channels.includes(msg.channel.id);
 	const channelNameIsIgnored = GuildData.Settings.channelIgnore.some(ignore => msg.channel.name.includes(ignore));
 	return roleIsExcluded || channelIsExcluded || channelNameIsIgnored;
+}
+
+function onlyOne(arr) {
+	let count = 0;
+	for (let i = 0; i < arr.length && count < 2; i++) {
+		if (arr[i]) {
+			count++;
+		}
+	}
+	if (count != 1) return false;
+	return true;
+}
+
+function liofaUpdate(interaction, GuildData) {
+	fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
+	console.log(interaction.guild.id.toString() + ' JSON updated');
 }

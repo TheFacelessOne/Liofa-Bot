@@ -24,7 +24,7 @@ module.exports = {
 
 	usage: '[list [option] | prefix <new prefix> | languages <language code> | time <minutes> | warnings <warning count> | startwarnings <allowed messages>]',
 	execute(interaction) {
-		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+		const GuildData = functions.liofaRead(interaction.guild.id);
 		let inputs = [];
 
 		if (functions.liofaPrefixCheck(interaction)) {
@@ -116,8 +116,7 @@ module.exports = {
 			default:
 				return interaction.reply('No acceptable arguments were given. \n Acceptable arguments include "list, prefix, languages, time, warnings, startwarnings"');
 			}
-			fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
-			return console.log(interaction.guild.id.toString() + ' JSON updated');
+			functions.liofaUpdate(interaction, GuildData);
 		}
 	},
 };

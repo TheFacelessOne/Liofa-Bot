@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const fs = require('fs');
+const functions = require('../functions.js');
 const Response = {};
 Response[true] = 'on';
 Response[false] = 'off';
@@ -9,15 +9,14 @@ module.exports = {
 		.setName('toggle')
 		.setDescription('toggles Liofa'),
 	async execute(interaction) {
-		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+		const GuildData = functions.liofaRead(interaction.guild.id);
 		if (typeof GuildData.Settings.state == 'boolean') {
 			GuildData.Settings.state = !GuildData.Settings.state;
 		}
 		else {
 			GuildData.Settings.state = true;
 		}
-		const Update = JSON.stringify(GuildData, null, 2);
-		fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', Update);
+		functions.liofaUpdate(interaction, GuildData);
 		interaction.reply({ content: 'Liofa is turned ' + Response[GuildData.Settings.state], ephemeral: false });
 	},
 };

@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton } = require('discord.js');
-const fs = require('fs');
 const functions = require('../functions.js');
 const Exp = [new RegExp('{'), new RegExp('"', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
 const repl = ['', '', ' : ', ', ', '', ''];
@@ -17,7 +16,7 @@ module.exports = {
 	usage: '[user]',
 
 	async execute(message) {
-		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + message.guild.id + '.json'));
+		const GuildData = functions.liofaRead(message.guild.id);
 		let target;
 		if (functions.liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
@@ -53,13 +52,13 @@ module.exports = {
 	},
 	buttons : {
 		'reset' : async function reset(interaction, name) {
-			const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+			const GuildData = functions.liofaRead(interaction.guild.id);
 			const target = { id : functions.userToID(name[2], interaction), username : functions.userToString(functions.userToID(name[2], interaction), interaction) };
 			GuildData.Watchlist[target.id].warnings = 0;
 			const message = await interaction.message.fetch();
 			message.delete();
 			interaction.channel.send(target.username + '\'s infractions have been reset');
-			fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
+			functions.liofaUpdate(interaction, GuildData);
 			return;
 		},
 	},

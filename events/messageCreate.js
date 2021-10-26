@@ -1,5 +1,4 @@
 const functions = require('../functions.js');
-const fs = require('fs');
 
 module.exports = {
 	name: 'messageCreate',
@@ -14,7 +13,7 @@ module.exports = {
 
 			const GuildData = functions.liofaRead(msg.guild.id);
 			// Checks list of allowed languages
-			if (!GuildData.Settings.languages.includes(result.code)) {
+			if (!GuildData.Settings.languages.includes(result.code) && parseInt(result.percent) >= 90) {
 
 				// Warnings Check
 				const warnCount = liofaMod(msg);
@@ -97,8 +96,7 @@ module.exports = {
 
 			}
 			GuildData['Watchlist'][txt.author.id] = UserRef;
-			fs.writeFileSync('./Server Data/' + txt.guild.id + '.json', JSON.stringify(GuildData, null, 2));
-			console.log(txt.guild.id + '.json updated');
+			functions.liofaUpdate(txt, GuildData);
 			return UserRef.warnings;
 		}
 	},

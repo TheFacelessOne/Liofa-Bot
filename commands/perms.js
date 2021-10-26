@@ -31,7 +31,7 @@ module.exports = {
 
 	async execute(interaction) {
 		const inputs = interaction.options;
-		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+		const GuildData = functions.liofaRead(interaction.guild.id);
 		if (functions.liofaPrefixCheck(interaction)) {
 			const args = interaction.content.split(' ');
 			args.shift();
@@ -110,8 +110,7 @@ module.exports = {
 						message.edit(response);
 					}
 				}
-				fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
-				console.log(interaction.guild.id.toString() + ' JSON updated');
+				functions.liofaUpdate(interaction, GuildData);
 
 			}
 		}

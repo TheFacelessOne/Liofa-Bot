@@ -18,7 +18,7 @@ module.exports = {
 	usage: '[command name]',
 
 	async execute(interaction) {
-		const GuildData = JSON.parse(fs.readFileSync('./Server Data/' + interaction.guild.id + '.json'));
+		const GuildData = functions.liofaRead(interaction.guild.id);
 		const prefix = GuildData.Settings.prefix;
 		const inputs = interaction.options;
 		let comm;
