@@ -109,7 +109,10 @@ function userToID(identifier, msg) {
 function channelToString(identifier, msg) {
 	if (!isNaN(identifier) && msg.guild.channels.cache.has(identifier)) {
 		const LookUpChannel = msg.guild.channels.cache.find(channel => channel.id === identifier);
-		return LookUpChannel.name;
+		let output = LookUpChannel.name;
+		if (LookUpChannel.type === 'GUILD_CATEGORY') output = '📁 ' + output;
+		if (LookUpChannel.type === 'GUILD_TEXT') output = '✍ ' + output;
+		return output;
 	}
 	else if (typeof identifier == 'string') {
 		return identifier;
@@ -226,7 +229,8 @@ function liofaExcludedRolesOrChannels(msg) {
 	const roleIsExcluded = msg.member.roles.cache.some(ExcludedRole => GuildData.Permissions.excluded.includes(ExcludedRole.id));
 	const channelIsExcluded = GuildData.Settings.channels.includes(msg.channel.id);
 	const channelNameIsIgnored = GuildData.Settings.channelIgnore.some(ignore => msg.channel.name.includes(ignore));
-	return roleIsExcluded || channelIsExcluded || channelNameIsIgnored;
+	const channelParentIsExcluded = GuildData.Settings.channels.includes(msg.channel.parentId);
+	return roleIsExcluded || channelIsExcluded || channelNameIsIgnored || channelParentIsExcluded;
 }
 
 function onlyOne(arr) {
@@ -236,8 +240,7 @@ function onlyOne(arr) {
 			count++;
 		}
 	}
-	if (count != 1) return false;
-	return true;
+	return count;
 }
 
 function liofaUpdate(interaction, GuildData) {

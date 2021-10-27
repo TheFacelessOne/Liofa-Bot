@@ -22,7 +22,7 @@ module.exports = {
 				.addStringOption(Setting => Setting.setName('setting').setDescription('A Setting to edit').setRequired(true))
 				.addStringOption(Value => Value.setName('value').setDescription('Value to input for the setting').setRequired(false))),
 
-	usage: '[list [option] | prefix <new prefix> | languages <language code> | time <minutes> | warnings <warning count> | startwarnings <allowed messages>]',
+	usage: '[list <option> | [edit [prefix [new prefix] | languages [language code] | time [minutes] | warnings [warning count] | startwarnings [allowed messages]]',
 	execute(interaction) {
 		const GuildData = functions.liofaRead(interaction.guild.id);
 		let inputs = [];

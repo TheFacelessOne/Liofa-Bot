@@ -15,7 +15,7 @@ module.exports = {
 			return option;
 		}),
 
-	usage: '[command name]',
+	usage: '<command name>',
 
 	async execute(interaction) {
 		const GuildData = functions.liofaRead(interaction.guild.id);
