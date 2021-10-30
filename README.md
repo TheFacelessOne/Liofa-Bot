@@ -77,7 +77,7 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [x] Stop using one big "Liofa Data" Variable and read the files each time
 
-- [ ] Set up Slash commands
+- [x] Set up Slash commands
 
   
 
