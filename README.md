@@ -75,6 +75,10 @@ I would appreciate any and all help with translations. I only speak English myse
 
 - [x] Ignore emojis
 
+- [x] Stop using one big "Liofa Data" Variable and read the files each time
+
+- [ ] Set up Slash commands
+
   
 
 ##### About Liofa

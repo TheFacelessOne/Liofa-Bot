@@ -1,55 +1,51 @@
-const fs = require('fs');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const functions = require('../functions.js');
 
 module.exports = {
-	name: 'whitelist',
-	description: 'Adds words to Liofa\'s ignored words list',
-	usage: '[list | add <word> | remove <word> ]',
-	execute(msg, args) {
-		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		// If you're asking for the list of all whitelisted words and phrases
-		if (args[0] == 'list') {
-			let list = '[';
-			Data.Settings.whitelist.forEach(element => list = list + element + '], [');
-			list = list.slice(0, -3);
-			msg.channel.send('**Whitelisted Words:**\n' + list);
-			return;
+	data : new SlashCommandBuilder()
+		.setName('whitelist')
+		.setDescription('Edit which words Liofa will ignore')
+		.addStringOption(keyword => keyword.setName('keyword').setDescription('Word(s) to add to the whitelist').setRequired(false)),
+
+	usage: '<words to add to the whitelist>',
+	async execute(message) {
+		const GuildData = functions.liofaRead(message.guild.id);
+		let words = [];
+		if (functions.liofaPrefixCheck(message)) {
+			const args = message.content.split(' ');
+			args.shift();
+			words = args;
 		}
+		else if (message.options.getString('keyword')) {
+			words = message.options.getString('keyword').split(' ');
+		}
+		if (typeof words[0] === 'string') {
+			await whitelistToggle(message, words);
+		}
+		let list = '[';
+		functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
+		list = list.slice(0, -3);
+		message.reply('**Whitelisted Words:**\n' + list);
+		return;
+
 		// if you're adding a word or phrase
-		else if (args[0] == 'add' || args[0] == 'a') {
-			args.shift();
-			if (args.length == 0) {
-				msg.channel.send('No words given, please provide one or more words to add to the whitelist');
-				return;
-			}
-			else if (args.some(element => Data.Settings.whitelist.includes(element))) {
-				msg.channel.send('One or more words already exist in the whitelist, use "' + Data.Settings.prefix + 'whitelist list" to list all whitelisted words');
-				return;
-			}
-			else {
-				args.forEach(element => Data.Settings.whitelist.push(element));
-				msg.channel.send('Whitelist updated');
-			}
-		}
-		// Remove words or phrases from the whitelist
-		else if (args[0] == 'remove' || args[0] == 'r') {
-			args.shift();
-			if (args.every(element => Data.Settings.whitelist.includes(element))) {
-				for (let i = 0; i < args.length; i++) {
-					const index = Data.Settings.whitelist.indexOf(args[i]);
-					Data.Settings.whitelist.splice(index, 1);
+		async function whitelistToggle(interaction, toggleList) {
+			const commandReply = await interaction.channel.send('Editing Whitelist...');
+			let response = '';
+			for (let i = 0; i < toggleList.length; i++) {
+				const listLength = GuildData.Settings.whitelist.length;
+				GuildData.Settings.whitelist = functions.arrayToggle(GuildData.Settings.whitelist, toggleList[i]);
+				if (listLength > GuildData.Settings.whitelist.length) {
+					response = response + '\n❌ `[' + words[i] + ']` removed from whitelist';
 				}
-				msg.channel.send('Whitelist updated');
+				else {
+					response = response + '\n✅ `[' + words[i] + ']` added to whitelist';
+				}
 			}
-			else {
-				msg.channel.send('One or more words do not exist in the whitelist, use "' + Data.Settings.prefix + 'whitelist list" to list all whitelisted words');
-				return;
-			}
+			commandReply.edit(response);
+			functions.liofaUpdate(interaction, GuildData);
+
 		}
-		else {
-			msg.channel.send('No accepted arguments given, \nAccepted arguments include "list, add, remove"');
-		}
-		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', JSON.stringify(Data, null, 2));
-		console.log(msg.guild.id.toString() + ' JSON updated');
 	},
 
 };

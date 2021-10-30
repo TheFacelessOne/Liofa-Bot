@@ -1,21 +1,22 @@
-const fs = require('fs');
+const { SlashCommandBuilder } = require('@discordjs/builders');
+const functions = require('../functions.js');
 const Response = {};
 Response[true] = 'on';
 Response[false] = 'off';
 
 module.exports = {
-	name: 'toggle',
-	description: 'toggles Liofa',
-	execute(msg) {
-		const Data = JSON.parse(fs.readFileSync('./Server Data/' + msg.guild.id + '.json'));
-		if (typeof Data.Settings.state == 'boolean') {
-			Data.Settings.state = !Data.Settings.state;
+	data: new SlashCommandBuilder()
+		.setName('toggle')
+		.setDescription('toggles Liofa'),
+	async execute(interaction) {
+		const GuildData = functions.liofaRead(interaction.guild.id);
+		if (typeof GuildData.Settings.state == 'boolean') {
+			GuildData.Settings.state = !GuildData.Settings.state;
 		}
 		else {
-			Data.Settings.state = true;
+			GuildData.Settings.state = true;
 		}
-		const Update = JSON.stringify(Data, null, 2);
-		fs.writeFileSync('./Server Data/' + msg.guild.id + '.json', Update);
-		msg.channel.send('Liofa is turned ' + Response[Data.Settings.state]);
+		functions.liofaUpdate(interaction, GuildData);
+		interaction.reply({ content: 'Liofa is turned ' + Response[GuildData.Settings.state], ephemeral: false });
 	},
 };
