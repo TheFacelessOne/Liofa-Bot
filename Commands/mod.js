@@ -61,5 +61,15 @@ module.exports = {
 			functions.liofaUpdate(interaction, GuildData);
 			return;
 		},
+		'undo' : async function undo(interaction, name) {
+			const GuildData = functions.liofaRead(interaction.guild.id);
+			const target = { id : functions.userToID(name[2], interaction), username : functions.userToString(functions.userToID(name[2], interaction), interaction) };
+			if (GuildData.Watchlist[target.id].warnings <= 0) return interaction.reply({ content : '🛑 User already has less than 1 infraction', ephemeral : true });
+			GuildData.Watchlist[target.id].warnings--;
+			functions.liofaUpdate(interaction, GuildData);
+			const message = await interaction.message.fetch();
+			message.delete();
+			return interaction.reply({ content : target.username + ' has one less infraction', ephemeral : true });
+		},
 	},
 };

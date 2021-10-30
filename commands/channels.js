@@ -60,12 +60,17 @@ module.exports = {
 
 		async function whitelist(interaction, channels) {
 			if (channels.length == 0) {
-				interaction.channel.send('No channels given, please provide at least one channel');
+				interaction.channel.send('🤡 No channels given, please provide at least one channel');
 				return;
 			}
 			channels = functions.channelToID(channels, interaction);
-			if (!channels.every(ch => interaction.guild.channels.cache.has(ch))) {
-				interaction.channel.send('One or more channels do not exist');
+			const bannedChannelTypes = ['GUILD_VOICE', 'GUILD_STAGE_VOICE'];
+			if (!channels.every(ch => {
+				const LookUpChannel = interaction.guild.channels.cache.find(channel => channel.id === ch);
+				return interaction.guild.channels.cache.has(ch) && !bannedChannelTypes.includes(LookUpChannel.type);
+			})
+			) {
+				interaction.channel.send('🤡 One or more channels do not exist or are not accepted channel types');
 				return;
 			}
 			else {

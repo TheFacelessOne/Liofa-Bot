@@ -8,7 +8,7 @@ module.exports = {
 			const command = interaction.client.commands.get(interaction.commandName);
 
 			if (!command) return;
-			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply('You have insufficient permissions 😬');
+			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 
 			try {
 				command.execute(interaction);
@@ -23,7 +23,7 @@ module.exports = {
 			const button = name[1];
 			const command = interaction.client.commands.get(name[0]);
 			if (!command) return;
-			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply('You have insufficient permissions 😬');
+			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 
 			try {
 				command.buttons[button](interaction, name);

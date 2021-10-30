@@ -1,4 +1,5 @@
 const functions = require('../functions.js');
+const { MessageActionRow, MessageButton } = require('discord.js');
 
 module.exports = {
 	name: 'messageCreate',
@@ -19,14 +20,21 @@ module.exports = {
 				const warnCount = liofaMod(msg);
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
+					const buttons = new MessageActionRow()
+						.addComponents(
+							new MessageButton().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle('LINK'),
+							new MessageButton().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle('PRIMARY').setDisabled(true),
+							new MessageButton().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle('DANGER'),
+						);
 
 					const LiofaMessages = require('../Read Only/Responses');
 					// Checks if output for given language is available
 					if (typeof LiofaMessages[result.code] === 'string') {
-						msg.reply('**' + LiofaMessages[result.code] + '** \n `[' + result.name + '] [' + result.percent + '%] code: [' + result.code + ']`');
+						msg.reply({ content : '**' + LiofaMessages[result.code] + '**', components : [buttons] });
 					}
 					else {
 						msg.reply('**Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
+						msg.reply({ content : '**Please speak English.**', components : [buttons] });
 						msg.channel.send(result.name + ' must be added to Languages. code: `[' + result.code + ']`');
 					}
 				}
@@ -63,7 +71,7 @@ module.exports = {
 						command.execute(txt);
 					}
 					else {
-						txt.reply('You have insufficient permissions 😬');
+						txt.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 					}
 					return false;
 				}
