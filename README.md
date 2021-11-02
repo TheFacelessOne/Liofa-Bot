@@ -1,7 +1,7 @@
 # Liofa Bot
 
 ### A Discord Bot for dealing with people speaking other languages
-### [Invite Link](https://discord.com/api/oauth2/authorize?client_id=866186816645890078&permissions=76800&scope=bot)
+### [Invite Link](https://discord.com/api/oauth2/authorize?client_id=866186816645890078&permissions=274877982720&scope=applications.commands%20bot)
 ### [Support Server](https://discord.gg/ay7uzuHctN)
 ### [Github](https://github.com/TheFacelessOne/Liofa-Bot)
 
