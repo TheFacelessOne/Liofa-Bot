@@ -18,7 +18,9 @@ module.exports = {
 	liofaPermsCheck,
 	liofaExcludedRolesOrChannels,
 	onlyOne,
-	liofaUpdate };
+	liofaUpdate,
+	capitalizeFirstLetter,
+	liofaMod };
 const cld = require('cld');
 const fs = require('fs');
 
@@ -246,4 +248,31 @@ function onlyOne(arr) {
 function liofaUpdate(interaction, GuildData) {
 	fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
 	console.log(interaction.guild.id.toString() + ' JSON updated');
+}
+
+function capitalizeFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Check Warning Status
+function liofaMod(interaction, target) {
+	target = userToID(target);
+	const GuildData = liofaRead(interaction.guild.id);
+	let UserRef = GuildData['Watchlist'][target];
+
+	if (typeof UserRef === 'undefined') {
+		UserRef = { warnings : 1, time : Date.now() };
+	}
+	else if ((Date.now() - UserRef.time) < GuildData.Settings.time) {
+		UserRef.warnings++;
+		UserRef.time = Date.now();
+
+	}
+	else {
+		UserRef = { warnings : 1, time : Date.now() };
+
+	}
+	GuildData['Watchlist'][target] = UserRef;
+	liofaUpdate(interaction, GuildData);
+	return UserRef.warnings;
 }

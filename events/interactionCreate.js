@@ -32,5 +32,19 @@ module.exports = {
 				console.log(err);
 			}
 		}
+		else if(interaction.isSelectMenu()) {
+			const name = interaction.values[0].split(' ');
+			const menu = name[1];
+			const command = interaction.client.commands.get(name[0]);
+			if (!command) return;
+			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
+
+			try {
+				command.menu[menu](interaction, name);
+			}
+			catch (err) {
+				console.log(err);
+			}
+		}
 	},
 };

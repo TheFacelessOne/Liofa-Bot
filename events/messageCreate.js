@@ -17,7 +17,7 @@ module.exports = {
 			if (!GuildData.Settings.languages.includes(result.code) && parseInt(result.percent) >= 90) {
 
 				// Warnings Check
-				const warnCount = liofaMod(msg);
+				const warnCount = functions.liofaMod(msg, msg.author.id);
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
 					const buttons = new MessageActionRow()
@@ -84,28 +84,6 @@ module.exports = {
 				return false;
 			}
 			return GuildData.Settings.state;
-		}
-
-		// Check Warning Status
-		function liofaMod(txt) {
-			const GuildData = functions.liofaRead(txt.guild.id);
-			let UserRef = GuildData['Watchlist'][txt.author.id];
-
-			if (typeof UserRef === 'undefined') {
-				UserRef = { warnings : 1, time : Date.now() };
-			}
-			else if ((Date.now() - UserRef.time) < GuildData.Settings.time) {
-				UserRef.warnings++;
-				UserRef.time = Date.now();
-
-			}
-			else {
-				UserRef = { warnings : 1, time : Date.now() };
-
-			}
-			GuildData['Watchlist'][txt.author.id] = UserRef;
-			functions.liofaUpdate(txt, GuildData);
-			return UserRef.warnings;
 		}
 	},
 };
