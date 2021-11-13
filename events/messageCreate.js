@@ -17,7 +17,7 @@ module.exports = {
 			if (!GuildData.Settings.languages.includes(result.code) && parseInt(result.percent) >= 90) {
 
 				// Warnings Check
-				const warnCount = liofaMod(msg);
+				const warnCount = functions.liofaMod(msg, msg.author.id);
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
 					const buttons = new MessageActionRow()
@@ -25,21 +25,22 @@ module.exports = {
 							new MessageButton().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle('LINK'),
 							new MessageButton().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle('PRIMARY').setDisabled(true),
 							new MessageButton().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle('DANGER'),
+							new MessageButton().setCustomId('invite links').setLabel('Get Liofa!').setStyle('SUCCESS'),
 						);
 
 					const LiofaMessages = require('../Read Only/Responses');
 					// Checks if output for given language is available
 					if (typeof LiofaMessages[result.code] === 'string') {
-						msg.reply({ content : '**' + LiofaMessages[result.code] + '**', components : [buttons] });
+						msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**', components : [buttons] });
 					}
 					else {
-						msg.reply('**Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
+						msg.reply('<@' + msg.author.id + '> **Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
 						msg.reply({ content : '**Please speak English.**', components : [buttons] });
 						msg.channel.send(result.name + ' must be added to Languages. code: `[' + result.code + ']`');
 					}
 				}
 				else if (warnCount == msgBeforeDeletion) {
-					msg.reply('All further messages will be deleted unless you speak in English');
+					msg.reply('<@' + msg.author.id + '> All further messages will be deleted unless you speak in English');
 				}
 				else if (warnCount > msgBeforeDeletion) {
 					msg.delete();
@@ -84,28 +85,6 @@ module.exports = {
 				return false;
 			}
 			return GuildData.Settings.state;
-		}
-
-		// Check Warning Status
-		function liofaMod(txt) {
-			const GuildData = functions.liofaRead(txt.guild.id);
-			let UserRef = GuildData['Watchlist'][txt.author.id];
-
-			if (typeof UserRef === 'undefined') {
-				UserRef = { warnings : 1, time : Date.now() };
-			}
-			else if ((Date.now() - UserRef.time) < GuildData.Settings.time) {
-				UserRef.warnings++;
-				UserRef.time = Date.now();
-
-			}
-			else {
-				UserRef = { warnings : 1, time : Date.now() };
-
-			}
-			GuildData['Watchlist'][txt.author.id] = UserRef;
-			functions.liofaUpdate(txt, GuildData);
-			return UserRef.warnings;
 		}
 	},
 };
