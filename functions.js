@@ -223,7 +223,8 @@ function liofaPermsCheck(msg, command) {
 	const GuildData = liofaRead(msg.guild.id);
 	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
-	return isAdmin || hasPerms;
+	const everyoneCanUse = command.everyone;
+	return isAdmin || hasPerms || everyoneCanUse;
 }
 
 function liofaExcludedRolesOrChannels(msg) {

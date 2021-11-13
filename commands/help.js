@@ -16,6 +16,7 @@ module.exports = {
 		}),
 
 	usage: '<command name>',
+	everyone: true,
 
 	async execute(interaction) {
 		const GuildData = functions.liofaRead(interaction.guild.id);

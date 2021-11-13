@@ -1,5 +1,5 @@
 {
-    "Version" : "2.1.0",
+    "Version" : "2.3.0",
     "Settings": {
       "state": true,
       "whitelist": [],
@@ -24,7 +24,8 @@
       "whitelist": [],
       "settings": [],
       "channels": [],
-      "help": []
+      "help": [],
+      "invite": []
     },
     "Watchlist": {}
   }
