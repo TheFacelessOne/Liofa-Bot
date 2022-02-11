@@ -27,8 +27,14 @@ const fs = require('fs');
 
 // Check for Language
 async function liofaCheck(msg) {
-	const result = await cld.detect(msg);
-	return result.languages[0];
+	try {
+		const result = await cld.detect(msg);
+		return result.languages[0];
+	}
+	catch {
+		console.error('Language detection failed on: \n' + msg);
+		return false;
+	}
 }
 
 // Converts role IDs into their name

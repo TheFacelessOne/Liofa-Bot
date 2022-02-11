@@ -8,8 +8,9 @@ module.exports = {
 
 		try {
 			const MessageContent = functions.liofaFilter(msg);
-			if (!MessageContent) return;
+			if (!MessageContent || MessageContent.length < 4) return;
 			const result = await functions.liofaCheck(MessageContent);
+			if (!result) return;
 
 
 			const GuildData = functions.liofaRead(msg.guild.id);
