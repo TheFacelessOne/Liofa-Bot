@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const functions = require('../functions.js');
+const bold = functions.boldText;
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -46,16 +48,28 @@ module.exports = {
 
 		async function settingsList(args) {
 			if (typeof args[1] === 'object' || typeof args[1] === 'undefined') {
-				return interaction.reply(
-					'**Liofa is turned on: **\n> ' + GuildData.Settings.state +
-					'\n\n**Whitelist contains: **\n> ' + GuildData.Settings.whitelist.length + ' entries' +
-					'\n\n**Languages contains: **\n> ' + GuildData.Settings.languages.length + ' acceptable languages' +
-					'\n\n**Time until past infractions are ignored: ** \n> ' + Math.floor((GuildData.Settings.time / 1000) / 60) + ' minutes' +
-					'\n\n**Messages allowed before warnings are given: **\n> ' + GuildData.Settings.startwarnings +
-					'\n\n**Maximum warnings given: **\n> ' + GuildData.Settings.warnings +
-					'\n\n**Whitelisted channels contains: **\n> ' + GuildData.Settings.channels.length + ' channels' +
-					'\n\n**Ignored channel keywords contains: **\n> ' + GuildData.Settings.channelIgnore.length + ' entries' +
-					'\n\n**Commands prefix: ** \n> "' + GuildData.Settings.prefix + '"');
+				let stateEmoji;
+				GuildData.Settings.state ? stateEmoji = '✅' : stateEmoji = '❌';
+				const infractionsIgnoredAfter = Math.floor((GuildData.Settings.time / 1000) / 60);
+
+				const listEmbed = new MessageEmbed()
+					.setColor('#00ff08')
+					.setTitle('Settings')
+					.addFields(
+						{ name : 'State', value : stateEmoji, inline : true },
+						{ name : 'Whitelist contains', value : bold(GuildData.Settings.whitelist.length) + ' entries', inline : true },
+						{ name : 'Languages contains', value : bold(GuildData.Settings.languages.length) + ' accepted languages', inline : true },
+						{ name: '\u200B', value: '\u200B' },
+						{ name : 'Infractions ignored after', value : bold(infractionsIgnoredAfter) + ' minutes', inline : true },
+						{ name : 'Messages before warning', value : bold(GuildData.Settings.startwarnings) + ' messages allowed', inline : true },
+						{ name : 'Maximum warnings', value : bold(GuildData.Settings.warnings) + ' warnings given', inline : true },
+						{ name: '\u200B', value: '\u200B' },
+						{ name : 'Whitelisted channels', value : bold(GuildData.Settings.channels.length) + ' channels', inline : true },
+						{ name : 'Ignored channel keywords', value : bold(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
+						{ name : 'Prefix', value : bold(GuildData.Settings.prefix), inline : true },
+					)
+					.setFooter('Settings listed are for ' + interaction.guild.id);
+				return interaction.reply({ embeds : [listEmbed] });
 			}
 			else if (typeof GuildData.Settings[args[1]] === 'object') {
 				let settingArray = '__**' + args[1] + ' contains:**__';

@@ -1,18 +1,22 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
 const functions = require('../functions.js');
-const Exp = [new RegExp('{'), new RegExp('"', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
-const repl = ['', '', ' : ', ', ', '', ''];
+const bold = functions.boldText;
+
 
 async function displayInfractions(interaction, target) {
 	const GuildData = functions.liofaRead(interaction.guild.id);
-	let timeSinceLastInfraction = functions.minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
-	let list = JSON.stringify(GuildData.Watchlist[target.id]);
-	for (let x = 0; x < Exp.length; x++) list = list.replace(Exp[x], repl[x]);
+	const timeSinceLastInfraction = functions.minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
+	const warningCount = GuildData.Watchlist[target.id].warnings;
 
-	timeSinceLastInfraction = '\n__**Time:**__ \n>\t`' + timeSinceLastInfraction + '` minutes since last infraction';
-	const warningCount = '\n__**Warnings:**__ \n>\t`' + GuildData.Watchlist[target.id].warnings + '` warnings';
-	return '__**Name:**__ \n>\t' + target.username + timeSinceLastInfraction + warningCount;
+	const infractionsEmbed = new MessageEmbed()
+		.setColor('#a60000')
+		.setTitle(bold(target.username))
+		.addField('Minutes since last infraction', bold(timeSinceLastInfraction))
+		.addField('Warnings given', bold(warningCount))
+		.setThumbnail('https://cdn.discordapp.com/avatars/' + target.id + '/' + target.avatar + '.png')
+		.setFooter('Settings listed are for ' + interaction.guild.id);
+	return infractionsEmbed;
 }
 
 async function modButtons(resetButton, target) {
@@ -42,7 +46,9 @@ module.exports = {
 		let target;
 		if (functions.liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
-			target = { id : functions.userToID(args[1], message), username : functions.userToString(functions.userToID(args[1], message), message) };
+			target = await message.guild.members.fetch(functions.userToID(args[1], message));
+			target = target.user;
+			if (typeof target === 'undefined') return;
 		}
 		else {
 			target = message.options.getUser('user');
@@ -56,7 +62,7 @@ module.exports = {
 			if(GuildData.Watchlist[target.id] != null) {
 				if (GuildData.Watchlist[target.id].warnings != 0) buttons = await modButtons(false, target);
 
-				return interaction.reply({ content: await displayInfractions(interaction, target), components : [buttons] });
+				return interaction.reply({ embeds: [await displayInfractions(interaction, target)], components : [buttons] });
 			}
 			else {
 				return interaction.reply({ content : target.username + ' has 0 infractions', components : [buttons] });
@@ -66,7 +72,9 @@ module.exports = {
 	buttons : {
 		'reset' : async function reset(interaction, name) {
 			const GuildData = functions.liofaRead(interaction.guild.id);
-			const target = { id : functions.userToID(name[2], interaction), username : functions.userToString(functions.userToID(name[2], interaction), interaction) };
+			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
+			target = target.user;
+			if (typeof target === 'undefined') return;
 			GuildData.Watchlist[target.id].warnings = 0;
 			const message = await interaction.message.fetch();
 			message.delete();
@@ -76,7 +84,9 @@ module.exports = {
 		},
 		'undo' : async function undo(interaction, name) {
 			const GuildData = functions.liofaRead(interaction.guild.id);
-			const target = { id : functions.userToID(name[2], interaction), username : functions.userToString(functions.userToID(name[2], interaction), interaction) };
+			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
+			target = target.user;
+			if (typeof target === 'undefined') return;
 			if (GuildData.Watchlist[target.id].warnings <= 0) return interaction.reply({ content : '🛑 User already has less than 1 infraction', ephemeral : true });
 			GuildData.Watchlist[target.id].warnings--;
 			functions.liofaUpdate(interaction, GuildData);
@@ -85,11 +95,13 @@ module.exports = {
 			return interaction.reply({ content : target.username + ' has one less infraction', ephemeral : true });
 		},
 		'increase' : async function increase(interaction, name) {
-			const target = { id : functions.userToID(name[2], interaction), username : functions.userToString(functions.userToID(name[2], interaction), interaction) };
+			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
+			target = target.user;
+			if (typeof target === 'undefined') return;
 			functions.liofaMod(interaction, target.id);
 			const message = await interaction.message.fetch();
 			message.delete();
-			interaction.reply({ content: await displayInfractions(interaction, target), components: [await modButtons(false, target)] });
+			interaction.reply({ embeds: [await displayInfractions(interaction, target)], components: [await modButtons(false, target)] });
 		},
 	},
 };
