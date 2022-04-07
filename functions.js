@@ -234,7 +234,8 @@ function liofaPermsCheck(msg, command) {
 	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
 	const everyoneCanUse = command.everyone;
-	return isAdmin || hasPerms || everyoneCanUse;
+	const isBotDev = ((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER));
+	return isAdmin || hasPerms || everyoneCanUse || isBotDev;
 }
 
 function liofaExcludedRolesOrChannels(msg) {

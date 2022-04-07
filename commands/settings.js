@@ -21,7 +21,7 @@ module.exports = {
 				}))
 		.addSubcommand(subcommand =>
 			subcommand.setName('edit').setDescription('Edit a setting')
-				.addStringOption(Setting => Setting.setName('setting').setDescription('A Setting to edit').setRequired(true))
+				.addStringOption(Setting => Setting.setName('setting').setDescription('A Setting to edit').setRequired(true).addChoice('Prefix', 'prefix').addChoice('Accepted Languages', 'languages').addChoice('Time to remember infraction', 'times').addChoice('Warnings given', 'warnings').addChoice('Warnings start after this many messages', 'startwarnings'))
 				.addStringOption(Value => Value.setName('value').setDescription('Value to input for the setting').setRequired(false))),
 
 	usage: '[list <option> | [edit [prefix [new prefix] | languages [language code] | time [minutes] | warnings [warning count] | startwarnings [allowed messages]]',
@@ -48,8 +48,12 @@ module.exports = {
 
 		async function settingsList(args) {
 			if (typeof args[1] === 'object' || typeof args[1] === 'undefined') {
-				let stateEmoji;
+				let stateEmoji, transEmoji, langEmoji, undoEmoji, getEmoji;
 				GuildData.Settings.state ? stateEmoji = '✅' : stateEmoji = '❌';
+				GuildData.Settings.buttons[0] ? transEmoji = '✅' : transEmoji = '❌';
+				GuildData.Settings.buttons[1] ? langEmoji = '✅' : langEmoji = '❌';
+				GuildData.Settings.buttons[2] ? undoEmoji = '✅' : undoEmoji = '❌';
+				GuildData.Settings.buttons[3] ? getEmoji = '✅' : getEmoji = '❌';
 				const infractionsIgnoredAfter = Math.floor((GuildData.Settings.time / 1000) / 60);
 
 				const listEmbed = new MessageEmbed()
@@ -67,6 +71,8 @@ module.exports = {
 						{ name : 'Whitelisted channels', value : bold(GuildData.Settings.channels.length) + ' channels', inline : true },
 						{ name : 'Ignored channel keywords', value : bold(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
 						{ name : 'Prefix', value : bold(GuildData.Settings.prefix), inline : true },
+						{ name: '\u200B', value: '\u200B' },
+						{ name : 'Buttons', value : transEmoji + ' Translator\n' + langEmoji + ' Language\n' + undoEmoji + ' Undo\n' + getEmoji + ' Get Liofa ', inline : true },
 					)
 					.setFooter('Settings listed are for ' + interaction.guild.id);
 				return interaction.reply({ embeds : [listEmbed] });
@@ -99,7 +105,7 @@ module.exports = {
 				interaction.reply('Accepted Language codes now contains: \n' + GuildData.Settings.languages);
 				break;
 
-			case 'time':
+			case 'times':
 				if(isNaN(args[2])) {
 					return interaction.reply('Please provide a number in minutes for the length of time to keep track of the last infraction');
 				}
