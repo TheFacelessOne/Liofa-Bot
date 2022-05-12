@@ -96,8 +96,12 @@ module.exports = {
 		async function settingsEdit(args) {
 			switch (args[1]) {
 			case 'prefix':
-				GuildData.Settings.prefix = args[2].toString();
-				interaction.reply('prefix updated to: "' + GuildData.Settings.prefix.toString() + '"');
+				if (typeof args[2] === 'undefined') {
+					interaction.reply('Please provide a valid prefix');}
+				else {
+					GuildData.Settings.prefix = args[2].toString();
+					interaction.reply('prefix updated to: "' + GuildData.Settings.prefix.toString() + '"');
+				}
 				break;
 
 			case 'languages':
