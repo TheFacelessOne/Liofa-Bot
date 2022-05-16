@@ -66,7 +66,8 @@ module.exports = {
 				.setColor('#ffffff')
 				.setTitle('Here\'s a list of all my commands:\n ')
 				.setDescription(info)
-				.setFooter('Help requested by ' + interaction.author.username);
+				try {helpEmbed.setFooter('Help requested by ' + interaction.user.username);}
+				catch {helpEmbed.setFooter('Help requested by ' + interaction.author.username);}
 			return interaction.reply({ embeds : [helpEmbed] });
 		}
 	},

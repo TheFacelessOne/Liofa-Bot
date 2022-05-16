@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 const functions = require('../functions.js');
 
 module.exports = {
@@ -25,6 +26,9 @@ module.exports = {
 		GuildData.Settings.buttons[1] ? langEmoji = '✅' : langEmoji = '❌';
 		GuildData.Settings.buttons[2] ? undoEmoji = '✅' : undoEmoji = '❌';
 		GuildData.Settings.buttons[3] ? getEmoji = '✅' : getEmoji = '❌';
-		interaction.reply(transEmoji + ' Translator\n' + langEmoji + ' Language\n' + undoEmoji + ' Undo\n' + getEmoji + ' Get Liofa ');
+		const buttonEmbed = new MessageEmbed()
+			.setColor('#00ff08')
+			.setDescription(transEmoji + ' Translator\n' + langEmoji + ' Language\n' + undoEmoji + ' Undo\n' + getEmoji + ' Get Liofa ')
+		interaction.reply({ embeds : [buttonEmbed] });
 	},
 };

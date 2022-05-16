@@ -57,7 +57,7 @@ module.exports = {
 				.setTitle('**Whitelisted Words:**')
 				.setDescription(list + '\n' + response)
 				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
-			message.reply({ embeds : [togglelistEmbed] });
+			interaction.reply({ embeds : [togglelistEmbed] });
 			commandReply.delete();
 			functions.liofaUpdate(interaction, GuildData);
 		}
