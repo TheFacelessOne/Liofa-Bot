@@ -86,6 +86,12 @@ module.exports = {
 				const command = txt.client.commands.get(args.shift().toLowerCase());
 				if (!command) return true;
 
+				// Checks required channel permissions
+				if(!txt.channel.permissionsFor(txt.guild.me).has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_MESSAGES'])){
+					txt.author.send('I don\'t have sufficient permissions required to run the command in that channel\!😭\nPlease ensure I have these channel permissions:\n > **View Channel**\n > **Send Messages**\n > **Manage Messages**');
+					return false;
+				}
+
 				try {
 					// Checks you have permission to run the command
 					if (functions.liofaPermsCheck(txt, command)) {
