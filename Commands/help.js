@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 const fs = require('fs');
 const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
 const functions = require('../functions.js');
@@ -31,26 +32,43 @@ module.exports = {
 			comm = inputs.getString('command');
 		}
 
-
 		if (typeof comm != 'string') {
-			let info = 'Here\'s a list of all my commands:\n';
-			for (const [value] of Object.entries(Data.Permissions)) {
-				info = info.concat(value + '\n');
-			}
-			info = info.concat(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
-			return interaction.reply(info);
+			return helpList(inputs, interaction);
 		}
 		else if (!Data.Permissions[comm]) {
 			return interaction.reply('that\'s not a valid command!');
 		}
+
 		else {
+			return helpComm(inputs, interaction);
+		}
+//Embed for commands
+		async function helpComm(args) {
 			const command = interaction.client.commands.get(comm);
-			let info = `__**Name:**__ \n>\t**${command.data.name}**`;
+			const helpComm = new MessageEmbed()
+				.setColor('#ffffff')
+				.addField('__**Name:**__', '> ' + command.data.name)
+			if (command.data.description) {
+				helpComm.addField('__**Description:**__', '> *' + command.data.description + '*');}
+			if (command.usage) {
+				helpComm.addField('__**Usage:**__', '> `' + prefix + command.data.name + command.usage + '`');}
+			return interaction.reply({ embeds : [helpComm] });
+		}
+//Main Embed
+		async function helpList(args) {
+			var info = '';
+			for (const [value] of Object.entries(Data.Permissions)) {
+				info = info.concat(value + '\n');
+			}
+			info = info.concat(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
 
-			if (command.data.description) info = info.concat(`\n__**Description:**__ \n>\t*${command.data.description}*`);
-			if (command.usage) info = info.concat(`\n__**Usage:**__ \n>\t\`${prefix}${command.data.name} ${command.usage}\``);
-
-			interaction.reply(info);
+			const helpEmbed = new MessageEmbed()
+				.setColor('#ffffff')
+				.setTitle('Here\'s a list of all my commands:\n ')
+				.setDescription(info)
+				try {helpEmbed.setFooter('Help requested by ' + interaction.user.username);}
+				catch {helpEmbed.setFooter('Help requested by ' + interaction.author.username);}
+			return interaction.reply({ embeds : [helpEmbed] });
 		}
 	},
 };

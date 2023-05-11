@@ -199,6 +199,9 @@ function arrayToggle(list, input) {
 }
 
 function liofaRead(server) {
+	if (!fs.existsSync('./Server Data/' + server + '.json')) {
+		liofaJoin(server);
+	}
 	return JSON.parse(fs.readFileSync('./Server Data/' + server + '.json'));
 }
 
@@ -214,10 +217,10 @@ function liofaFilter(msg) {
 }
 
 function liofaJoin(newServer) {
-	const newServerFile = '../Server Data/' + newServer.id + '.json';
+	const newServerFile = './Server Data/' + newServer + '.json';
 	if (fs.existsSync(newServerFile)) return;
-	fs.copyFileSync('../Read Only/Settings.json', newServerFile);
-	console.log('Joined new server ' + newServer.id.toString());
+	fs.copyFileSync('./Read Only/Settings.json', newServerFile);
+	console.log('Joined new server ' + newServer.toString());
 }
 
 function liofaPrefixCheck(msg) {
@@ -231,7 +234,8 @@ function liofaPermsCheck(msg, command) {
 	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
 	const everyoneCanUse = command.everyone;
-	return isAdmin || hasPerms || everyoneCanUse;
+	const isBotDev = ((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER));
+	return isAdmin || hasPerms || everyoneCanUse || isBotDev;
 }
 
 function liofaExcludedRolesOrChannels(msg) {

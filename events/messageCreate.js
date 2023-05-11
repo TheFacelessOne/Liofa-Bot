@@ -21,23 +21,42 @@ module.exports = {
 				const warnCount = functions.liofaMod(msg, msg.author.id);
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
-					const buttons = new MessageActionRow()
-						.addComponents(
-							new MessageButton().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle('LINK'),
-							new MessageButton().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle('PRIMARY').setDisabled(true),
-							new MessageButton().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle('DANGER'),
-							new MessageButton().setCustomId('invite links').setLabel('Get Liofa!').setStyle('SUCCESS'),
-						);
+					const buttons = new MessageActionRow();
+					let printButtons = false;
+					if (GuildData.Settings.buttons.includes(true)) {
+						printButtons = true;
+						if (GuildData.Settings.buttons[0]) {
+							buttons.addComponents(new MessageButton().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle('LINK'));
+						}
+						if (GuildData.Settings.buttons[1]) {
+							buttons.addComponents(new MessageButton().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle('PRIMARY').setDisabled(true));
+						}
+						if (GuildData.Settings.buttons[2]) {
+							buttons.addComponents(new MessageButton().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle('DANGER'));
+						}
+						if (GuildData.Settings.buttons[3]) {
+							buttons.addComponents(new MessageButton().setCustomId('invite links').setLabel('Get Liofa!').setStyle('SUCCESS'));
+						}
+					}
 
 					const LiofaMessages = require('../Read Only/Responses');
 					// Checks if output for given language is available
 					if (typeof LiofaMessages[result.code] === 'string') {
-						msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**', components : [buttons] });
+						if (printButtons) {
+							msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**', components : [buttons] });
+						}
+						else {
+							msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**' });
+						}
 					}
 					else {
-						msg.reply('<@' + msg.author.id + '> **Please speak English.** \n `[' + result.name + '] [' + result.percent + '%]`');
-						msg.reply({ content : '**Please speak English.**', components : [buttons] });
-						msg.channel.send(result.name + ' must be added to Languages. code: `[' + result.code + ']`');
+						if (printButtons) {
+							msg.reply({ content : '**Please speak English.**', components : [buttons] });
+						}
+						else {
+							msg.reply({ content : '**Please speak English.**' });
+						}
+						msg.channel.send(result.name + ' must be added to Languages. Please report this bug on my support server A link can be found in my bio. code: `[' + result.code + ']`');
 					}
 				}
 				else if (warnCount == msgBeforeDeletion) {
@@ -66,6 +85,12 @@ module.exports = {
 				// Checks command exists
 				const command = txt.client.commands.get(args.shift().toLowerCase());
 				if (!command) return true;
+
+				// Checks required channel permissions
+				if(!txt.channel.permissionsFor(txt.guild.me).has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_MESSAGES'])){
+					txt.author.send('I don\'t have sufficient permissions required to run the command in that channel\!😭\nPlease ensure I have these channel permissions:\n > **View Channel**\n > **Send Messages**\n > **Manage Messages**');
+					return false;
+				}
 
 				try {
 					// Checks you have permission to run the command

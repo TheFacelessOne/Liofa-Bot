@@ -14,7 +14,7 @@ module.exports = {
 		function versionCheck(server) {
 			const GuildData = functions.liofaRead(server.id);
 			if (GuildData == 'undefined') {
-				functions.liofaJoin(server);
+				functions.liofaJoin(server.id);
 				return;
 			}
 			// Checks Server version against Default Settings version

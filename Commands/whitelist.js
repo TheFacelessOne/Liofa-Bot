@@ -1,4 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { MessageEmbed } = require('discord.js');
 const functions = require('../functions.js');
 
 module.exports = {
@@ -10,6 +11,7 @@ module.exports = {
 	usage: '<words to add to the whitelist>',
 	async execute(message) {
 		const GuildData = functions.liofaRead(message.guild.id);
+		const prefix = GuildData.Settings.prefix;
 		let words = [];
 		if (functions.liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
@@ -22,12 +24,17 @@ module.exports = {
 		if (typeof words[0] === 'string') {
 			await whitelistToggle(message, words);
 		}
-		let list = '[';
-		functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
-		list = list.slice(0, -3);
-		message.reply('**Whitelisted Words:**\n' + list);
-		return;
-
+		else {
+			let list = '[';
+			functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
+			list = list.slice(0, -3);
+			const whiteEmbed = new MessageEmbed()
+				.setColor('#e1c4ff')
+				.setTitle('**Whitelisted Words:**')
+				.setDescription(list)
+				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
+			return message.reply({ embeds : [whiteEmbed] });
+		}
 		// if you're adding a word or phrase
 		async function whitelistToggle(interaction, toggleList) {
 			const commandReply = await interaction.channel.send('Editing Whitelist...');
@@ -42,10 +49,17 @@ module.exports = {
 					response = response + '\n✅ `[' + words[i] + ']` added to whitelist';
 				}
 			}
-			commandReply.edit(response);
+			let list = '[';
+			GuildData.Settings.whitelist.forEach(element => list = list + element + '], [');
+			list = list.slice(0, -3);
+			const togglelistEmbed = new MessageEmbed()
+				.setColor('#e1c4ff')
+				.setTitle('**Whitelisted Words:**')
+				.setDescription(list + '\n' + response)
+				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
+			interaction.reply({ embeds : [togglelistEmbed] });
+			commandReply.delete();
 			functions.liofaUpdate(interaction, GuildData);
-
 		}
 	},
-
 };
