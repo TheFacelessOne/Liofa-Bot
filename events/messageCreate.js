@@ -1,8 +1,8 @@
 const functions = require('../functions.js');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
-	name: 'messageCreate',
+	name: 'MessageCreate',
 	async execute(msg) {
 		if (runLiofa(msg) === false) return;
 
@@ -21,21 +21,21 @@ module.exports = {
 				const warnCount = functions.liofaMod(msg, msg.author.id);
 				const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
 				if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
-					const buttons = new MessageActionRow();
+					const buttons = new ActionRowBuilder();
 					let printButtons = false;
 					if (GuildData.Settings.buttons.includes(true)) {
 						printButtons = true;
 						if (GuildData.Settings.buttons[0]) {
-							buttons.addComponents(new MessageButton().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle('LINK'));
+							buttons.addComponents(new ButtonBuilder().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle(ButtonStyle.Link));
 						}
 						if (GuildData.Settings.buttons[1]) {
-							buttons.addComponents(new MessageButton().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle('PRIMARY').setDisabled(true));
+							buttons.addComponents(new ButtonBuilder().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle(ButtonStyle.Primary).setDisabled(true));
 						}
 						if (GuildData.Settings.buttons[2]) {
-							buttons.addComponents(new MessageButton().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle('DANGER'));
+							buttons.addComponents(new ButtonBuilder().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle(ButtonStyle.Danger));
 						}
 						if (GuildData.Settings.buttons[3]) {
-							buttons.addComponents(new MessageButton().setCustomId('invite links').setLabel('Get Liofa!').setStyle('SUCCESS'));
+							buttons.addComponents(new ButtonBuilder().setCustomId('invite links').setLabel('Get Liofa!').setStyle(ButtonStyle.Success));
 						}
 					}
 

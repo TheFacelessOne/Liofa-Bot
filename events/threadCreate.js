@@ -1,5 +1,5 @@
 module.exports = {
-	name: 'threadCreate',
+	name: 'ThreadCreate',
 	execute(thread) {
 		thread.join();
 	},

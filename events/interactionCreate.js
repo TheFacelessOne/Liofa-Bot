@@ -1,17 +1,17 @@
 const functions = require('../functions.js');
 
 module.exports = {
-	name: 'interactionCreate',
+	name: 'InteractionCreate',
 	execute(interaction) {
 		// Checks required channel permissions
-		if(!interaction.channel.permissionsFor(interaction.guild.me).has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_MESSAGES'])) {
+		if (!interaction.channel.permissionsFor(interaction.guild.members.me).has(['ViewChannel', 'SendMessages', 'ManageMessages'])) {
 			return interaction.reply({ content : 'I don\'t have sufficient permissions required to run that command here\!😭\nPlease ensure I have these channel permissions:\n > **View Channel**\n > **Send Messages**\n > **Manage Messages**', ephemeral : true });}
 
 		else if (interaction.isCommand()) {
 			const command = interaction.client.commands.get(interaction.commandName);
 
 			if (!command) return;
-			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
+			if (!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 
 			try {
 				command.execute(interaction);
@@ -26,7 +26,7 @@ module.exports = {
 			const button = name[1];
 			const command = interaction.client.commands.get(name[0]);
 			if (!command) return;
-			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
+			if (!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 
 			try {
 				command.buttons[button](interaction, name);
@@ -35,12 +35,12 @@ module.exports = {
 				console.log(err);
 			}
 		}
-		else if(interaction.isSelectMenu()) {
+		else if (interaction.isSelectMenu()) {
 			const name = interaction.values[0].split(' ');
 			const menu = name[1];
 			const command = interaction.client.commands.get(name[0]);
 			if (!command) return;
-			if(!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
+			if (!functions.liofaPermsCheck(interaction, command)) return interaction.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
 
 			try {
 				command.menu[menu](interaction, name);

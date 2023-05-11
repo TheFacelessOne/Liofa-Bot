@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const { ActionRowBuilder, MessageSelectMenu } = require('discord.js');
 const fs = require('fs');
 const functions = require('../functions.js');
 const Exp = [new RegExp('{'), new RegExp('],', 'g'), new RegExp('\\[', 'g'), new RegExp('"', 'g'), new RegExp(']', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
@@ -38,9 +38,9 @@ module.exports = {
 		.setName('perms')
 		.setDescription('View or edit command permissions')
 		.addStringOption(option => {
+			option.setName('command').setDescription('A command to edit the permissions for').setRequired(false);
 			for (const [value] of Object.entries(Data.Permissions)) {
-				option.setName('command').setDescription('A command to edit the permissions for').setRequired(false)
-					.addChoice(value, value);
+				option.addChoices({ name: value, value: value });
 			}
 			return option;
 		})
@@ -86,7 +86,7 @@ module.exports = {
 
 		const info = await displayPerms(interaction, permission);
 
-		const menu = new MessageActionRow()
+		const menu = new ActionRowBuilder()
 			.addComponents(
 				new MessageSelectMenu()
 					.setCustomId('perms menu')

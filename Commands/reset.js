@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const fs = require('fs');
 
 module.exports = {
@@ -8,12 +8,12 @@ module.exports = {
 		.setDescription('Reset Server Settings to default'),
 
 	async execute(interaction) {
-		const buttons = new MessageActionRow()
+		const buttons = new ActionRowBuilder()
 			.addComponents(
-				new MessageButton()
-					.setCustomId('reset confirm').setLabel('Confirm').setStyle('SUCCESS'),
-				new MessageButton()
-					.setCustomId('reset cancel').setLabel('Cancel').setStyle('DANGER'),
+				new ButtonBuilder()
+					.setCustomId('reset confirm').setLabel('Confirm').setStyle(ButtonStyle.Success),
+				new ButtonBuilder()
+					.setCustomId('reset cancel').setLabel('Cancel').setStyle(ButtonStyle.Danger),
 			);
 		await interaction.reply({ content: 'Are you sure you want to reset your settings?', components: [buttons] });
 		return;

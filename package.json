@@ -1,32 +1,37 @@
 {
   "name": "liofa",
-  "version": "1.9.2",
-  "description": "- Instructs user to speak English in whichever language they're speaking (If known)",
-  "main": "bot.js",
+  "version": "3.0.0",
+  "description": "a discord bot for languages",
+  "main": "start.js",
   "scripts": {
-    "start": "node bot.js"
-  },
-  "author": "THE_FACELESS_ONE",
-  "license": "ISC",
-  "dependencies": {
-    "@discordjs/builders": "^0.6.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "cld": "^2.7.0",
-    "discord-api-types": "^0.23.1",
-    "discord.js": "^13.2.0",
-    "dotenv": "^10.0.0",
-    "fs": "^0.0.1-security"
-  },
-  "devDependencies": {
-    "eslint-config-prettier": "^8.3.0",
-    "prettier": "2.3.2"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TheFacelessOne/Liofa-Bot.git"
   },
+  "keywords": [
+    "liofa",
+    "discord",
+    "bot",
+    "language",
+    "fluent",
+    "translation",
+    "moderation"
+  ],
+  "author": "THE_FACELESS_ONE",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/TheFacelessOne/Liofa-Bot/issues"
   },
-  "homepage": "https://github.com/TheFacelessOne/Liofa-Bot#readme"
+  "homepage": "https://github.com/TheFacelessOne/Liofa-Bot#readme",
+  "dependencies": {
+    "cld": "^2.9.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.0.3",
+    "fs": "^0.0.1-security"
+  },
+  "devDependencies": {
+    "eslint": "^8.40.0"
+  }
 }

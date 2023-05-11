@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, MessageEmbed } = require('discord.js');
 const functions = require('../functions.js');
 const bold = functions.boldText;
 
@@ -20,12 +20,12 @@ async function displayInfractions(interaction, target) {
 }
 
 async function modButtons(resetButton, target) {
-	const display = new MessageActionRow()
+	const display = new ActionRowBuilder()
 		.addComponents(
-			new MessageButton()
-				.setCustomId('mod reset ' + [target.id]).setLabel('Reset infractions').setStyle('SUCCESS').setDisabled(resetButton),
-			new MessageButton()
-				.setCustomId('mod increase ' + [target.id]).setLabel('+1 Infraction').setStyle('DANGER'),
+			new ButtonBuilder()
+				.setCustomId('mod reset ' + [target.id]).setLabel('Reset infractions').setStyle(ButtonStyle.Success).setDisabled(resetButton),
+			new ButtonBuilder()
+				.setCustomId('mod increase ' + [target.id]).setLabel('+1 Infraction').setStyle(ButtonStyle.Danger),
 		);
 	return display;
 }

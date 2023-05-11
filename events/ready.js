@@ -4,7 +4,7 @@ const readSettings = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
 
 // Start up process
 module.exports = {
-	name: 'ready',
+	name: 'Ready',
 	once: true,
 	execute(client) {
 		client.guilds.cache.forEach(guild => versionCheck(guild));

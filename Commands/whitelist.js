@@ -25,15 +25,15 @@ module.exports = {
 			await whitelistToggle(message, words);
 		}
 		else {
-		let list = '[';
-		functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
-		list = list.slice(0, -3);
-		const whiteEmbed = new MessageEmbed()
-			.setColor('#e1c4ff')
-			.setTitle('**Whitelisted Words:**')
-			.setDescription(list)
-			.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
-		return message.reply({ embeds : [whiteEmbed] });
+			let list = '[';
+			functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
+			list = list.slice(0, -3);
+			const whiteEmbed = new MessageEmbed()
+				.setColor('#e1c4ff')
+				.setTitle('**Whitelisted Words:**')
+				.setDescription(list)
+				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
+			return message.reply({ embeds : [whiteEmbed] });
 		}
 		// if you're adding a word or phrase
 		async function whitelistToggle(interaction, toggleList) {

@@ -3,10 +3,16 @@ require('dotenv').config();
 const fs = require('fs');
 
 // Discord stuff
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Events, GatewayIntentBits, IntentsBitField } = require('discord.js');
 
-const myIntents = new Intents();
-myIntents.add(Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES);
+const myIntents = new IntentsBitField();
+
+myIntents.add(
+	GatewayIntentBits.Guilds,
+	GatewayIntentBits.GuildMessages,
+	GatewayIntentBits.MessageContent,
+	GatewayIntentBits.GuildMembers,
+);
 const client = new Client({ intents: myIntents });
 
 
@@ -25,11 +31,11 @@ const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
+		client.once(Events[event.name], (...args) => event.execute(...args));
 	}
 	else {
-		client.on(event.name, (...args) => event.execute(...args));
+		client.on(Events[event.name], (...args) => event.execute(...args));
 	}
 }
 
-client.login(process.env.BOTTOKEN);
+client.login(process.env.DEVTOKEN).then(console.log('liofa is listening'));
