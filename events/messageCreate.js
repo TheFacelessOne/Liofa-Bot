@@ -2,7 +2,7 @@ const functions = require('../functions.js');
 const { MessageActionRow, MessageButton } = require('discord.js');
 
 module.exports = {
-	name: 'messageCreate',
+	name: 'MessageCreate',
 	async execute(msg) {
 		if (runLiofa(msg) === false) return;
 

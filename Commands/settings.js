@@ -12,9 +12,10 @@ module.exports = {
 			subcommand.setName('list').setDescription('List all settings or get more info on a specific setting')
 				.addStringOption(Setting => {
 					const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
+					Setting.setName('setting').setDescription('A Setting to learn more about').setRequired(false);
 					for (const [value] of Object.entries(Data.Settings)) {
 						if (typeof Data.Settings[value] == 'object') {
-							Setting.setName('setting').setDescription('A Setting to learn more about').setRequired(false).addChoice(value, value);
+							Setting.addChoices({ name: value, value: value });
 						}
 					}
 					return Setting;
@@ -100,7 +101,7 @@ module.exports = {
 				break;
 
 			case 'time':
-				if(isNaN(args[2])) {
+				if (isNaN(args[2])) {
 					return interaction.reply('Please provide a number in minutes for the length of time to keep track of the last infraction');
 				}
 				else {

@@ -1,7 +1,7 @@
 const functions = require('../functions.js');
 
 module.exports = {
-	name: 'guildCreate',
+	name: 'GuildCreate',
 	execute(server) {
 		functions.liofaJoin(server);
 	},

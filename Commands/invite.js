@@ -1,13 +1,13 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
-const buttons = new MessageActionRow()
+const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const buttons = new ActionRowBuilder()
 	.addComponents(
-		new MessageButton()
+		new ButtonBuilder()
 			.setURL('https://discord.com/oauth2/authorize?client_id=866186816645890078&permissions=274877982720&scope=applications.commands%20bot')
-			.setLabel('Get Liofa on your server').setStyle('LINK'),
-		new MessageButton()
+			.setLabel('Get Liofa on your server').setStyle(ButtonStyle.Link),
+		new ButtonBuilder()
 			.setURL('https://discord.gg/ay7uzuHctN')
-			.setLabel('Join the Liofa Support Server').setStyle('LINK'),
+			.setLabel('Join the Liofa Support Server').setStyle(ButtonStyle.Link),
 	);
 
 module.exports = {

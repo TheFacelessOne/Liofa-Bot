@@ -38,9 +38,9 @@ module.exports = {
 		.setName('perms')
 		.setDescription('View or edit command permissions')
 		.addStringOption(option => {
+			option.setName('command').setDescription('A command to edit the permissions for').setRequired(false);
 			for (const [value] of Object.entries(Data.Permissions)) {
-				option.setName('command').setDescription('A command to edit the permissions for').setRequired(false)
-					.addChoice(value, value);
+				option.addChoices({ name: value, value: value });
 			}
 			return option;
 		})
