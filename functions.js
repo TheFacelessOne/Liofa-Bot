@@ -224,7 +224,7 @@ function liofaJoin(newServer) {
 }
 
 function liofaPrefixCheck(msg) {
-	if (msg.type === 'APPLICATION_COMMAND') return false;
+	if (msg.type === 2) return false;
 	const GuildData = liofaRead(msg.guild.id);
 	return msg.cleanContent.includes(GuildData.Settings.prefix) && msg.cleanContent.search(GuildData.Settings.prefix) == 0;
 }

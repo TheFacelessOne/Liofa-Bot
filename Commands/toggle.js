@@ -18,12 +18,12 @@ module.exports = {
 			GuildData.Settings.state = true;
 		}
 		functions.liofaUpdate(interaction, GuildData);
-		const toggleEmbed = {
-			color: 0x0099ff,
-			description: 'Liofa is turned **' + Response[GuildData.Settings.state] + '**',
-		};
-		if (GuildData.Settings.state == true){toggleEmbed.color = 0x23ee27;}
-		if (GuildData.Settings.state == false){toggleEmbed.color = 0xff1818;}
+
+		const toggleEmbed = new EmbedBuilder()
+			.setColor(0x0099ff)
+			.setDescription('Liofa is turned **' + Response[GuildData.Settings.state] + '**');
+
+		GuildData.Settings.state ? toggleEmbed.setColor(0x23ee27) : toggleEmbed.setColor(0xff1818);
 		interaction.reply({ embeds : [toggleEmbed], ephemeral: false });
 	},
 };

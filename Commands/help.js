@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
 const functions = require('../functions.js');
@@ -62,12 +62,10 @@ module.exports = {
 			}
 			info = info.concat(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
 
-			const helpEmbed = new MessageEmbed()
+			const helpEmbed = new EmbedBuilder()
 				.setColor('#ffffff')
 				.setTitle('Here\'s a list of all my commands:\n ')
 				.setDescription(info)
-				try {helpEmbed.setFooter('Help requested by ' + interaction.user.username);}
-				catch {helpEmbed.setFooter('Help requested by ' + interaction.author.username);}
 			return interaction.reply({ embeds : [helpEmbed] });
 		}
 	},

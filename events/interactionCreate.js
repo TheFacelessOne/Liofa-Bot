@@ -4,7 +4,7 @@ module.exports = {
 	name: 'InteractionCreate',
 	execute(interaction) {
 		// Checks required channel permissions
-		if (!interaction.channel.permissionsFor(interaction.guild.me).has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_MESSAGES'])) {
+		if (!interaction.channel.permissionsFor(interaction.guild.members.me).has(['ViewChannel', 'SendMessages', 'ManageMessages'])) {
 			return interaction.reply({ content : 'I don\'t have sufficient permissions required to run that command here\!😭\nPlease ensure I have these channel permissions:\n > **View Channel**\n > **Send Messages**\n > **Manage Messages**', ephemeral : true });}
 
 		else if (interaction.isCommand()) {
