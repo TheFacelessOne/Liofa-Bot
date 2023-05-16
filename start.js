@@ -38,4 +38,4 @@ for (const file of eventFiles) {
 	}
 }
 
-client.login(process.env.DEVTOKEN).then(console.log('liofa is listening'));
+client.login(process.env.BOTTOKEN).then(console.log('liofa is listening'));
