@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const functions = require('../functions.js');
 const bold = functions.boldText;
@@ -53,7 +53,7 @@ module.exports = {
 				GuildData.Settings.state ? stateEmoji = '✅' : stateEmoji = '❌';
 				const infractionsIgnoredAfter = Math.floor((GuildData.Settings.time / 1000) / 60);
 
-				const listEmbed = new MessageEmbed()
+				const listEmbed = new EmbedBuilder()
 					.setColor('#00ff08')
 					.setTitle('Settings')
 					.addFields(
@@ -69,7 +69,7 @@ module.exports = {
 						{ name : 'Ignored channel keywords', value : bold(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
 						{ name : 'Prefix', value : bold(GuildData.Settings.prefix), inline : true },
 					)
-					.setFooter('Settings listed are for ' + interaction.guild.id);
+					.setFooter({ text : 'Settings listed are for ' + interaction.guild.id });
 				return interaction.reply({ embeds : [listEmbed] });
 			}
 			else if (typeof GuildData.Settings[args[1]] === 'object') {

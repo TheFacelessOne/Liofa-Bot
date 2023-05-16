@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { ActionRowBuilder, MessageSelectMenu } = require('discord.js');
+const { ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const fs = require('fs');
 const functions = require('../functions.js');
 const Exp = [new RegExp('{'), new RegExp('],', 'g'), new RegExp('\\[', 'g'), new RegExp('"', 'g'), new RegExp(']', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
@@ -88,7 +88,7 @@ module.exports = {
 
 		const menu = new ActionRowBuilder()
 			.addComponents(
-				new MessageSelectMenu()
+				new StringSelectMenuBuilder()
 					.setCustomId('perms menu')
 					.setPlaceholder('View other permissions')
 					.addOptions(permsMenuMaker()),

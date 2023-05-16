@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const functions = require('../functions.js');
 
 module.exports = {
@@ -28,7 +28,7 @@ module.exports = {
 			let list = '[';
 			functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
 			list = list.slice(0, -3);
-			const whiteEmbed = new MessageEmbed()
+			const whiteEmbed = new EmbedBuilder()
 				.setColor('#e1c4ff')
 				.setTitle('**Whitelisted Words:**')
 				.setDescription(list)
@@ -52,7 +52,7 @@ module.exports = {
 			let list = '[';
 			GuildData.Settings.whitelist.forEach(element => list = list + element + '], [');
 			list = list.slice(0, -3);
-			const togglelistEmbed = new MessageEmbed()
+			const togglelistEmbed = new EmbedBuilder()
 				.setColor('#e1c4ff')
 				.setTitle('**Whitelisted Words:**')
 				.setDescription(list + '\n' + response)

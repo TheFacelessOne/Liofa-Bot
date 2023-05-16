@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { ActionRowBuilder, ButtonBuilder, MessageEmbed } = require('discord.js');
+const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
 const functions = require('../functions.js');
 const bold = functions.boldText;
 
@@ -9,13 +9,14 @@ async function displayInfractions(interaction, target) {
 	const timeSinceLastInfraction = functions.minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
 	const warningCount = GuildData.Watchlist[target.id].warnings;
 
-	const infractionsEmbed = new MessageEmbed()
-		.setColor('#a60000')
+	const infractionsEmbed = new EmbedBuilder()
+		.setColor(0xa60000)
 		.setTitle(bold(target.username))
-		.addField('Minutes since last infraction', bold(timeSinceLastInfraction))
-		.addField('Warnings given', bold(warningCount))
+		.addFields(
+			{ name : 'Minutes since last infraction', value : bold(timeSinceLastInfraction)},
+			{ name : 'Warnings given', value : bold(warningCount)})
 		.setThumbnail('https://cdn.discordapp.com/avatars/' + target.id + '/' + target.avatar + '.png')
-		.setFooter('Settings listed are for ' + interaction.guild.id);
+		.setFooter({ text : 'Settings listed are for ' + interaction.guild.id });
 	return infractionsEmbed;
 }
 

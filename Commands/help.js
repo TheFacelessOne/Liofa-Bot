@@ -45,13 +45,13 @@ module.exports = {
 //Embed for commands
 		async function helpComm(args) {
 			const command = interaction.client.commands.get(comm);
-			const helpComm = new MessageEmbed()
+			const helpComm = new EmbedBuilder()
 				.setColor('#ffffff')
-				.addField('__**Name:**__', '> ' + command.data.name)
+				.addFields({ name : '__**Name:**__', value : '> ' + command.data.name })
 			if (command.data.description) {
-				helpComm.addField('__**Description:**__', '> *' + command.data.description + '*');}
+				helpComm.addFields({ name : '__**Description:**__', value : '> *' + command.data.description + '*' });}
 			if (command.usage) {
-				helpComm.addField('__**Usage:**__', '> `' + prefix + command.data.name + command.usage + '`');}
+				helpComm.addFields({ name : '__**Usage:**__', value : '> `' + prefix + command.data.name + command.usage + '`' });}
 			return interaction.reply({ embeds : [helpComm] });
 		}
 //Main Embed
