@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const functions = require('../functions.js');
+const { liofaRead, onlyOne, liofaPrefixCheck, arrayToggle, liofaUpdate } = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -10,10 +10,10 @@ module.exports = {
 
 	usage: '[whitelist <channel> | ignore <keywords to ignore> | list]',
 	execute(message) {
-		let GuildData = functions.liofaRead(message.guild.id);
+		let GuildData = liofaRead(message.guild.id);
 		const inputs = message.options;
-		const inputCount = functions.onlyOne([inputs.getChannel('whitelist'), inputs.getString('keyword')]);
-		if (functions.liofaPrefixCheck(message)) {
+		const inputCount = onlyOne([inputs.getChannel('whitelist'), inputs.getString('keyword')]);
+		if (liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
 			args.shift();
 			if (args[0] === 'whitelist') {
@@ -45,9 +45,9 @@ module.exports = {
 		}
 
 		async function info(interaction) {
-			GuildData = functions.liofaRead(message.guild.id);
+			GuildData = liofaRead(message.guild.id);
 			let list = '';
-			GuildData.Settings.channels.forEach(element => list = list + functions.channelToString(element, interaction) + '\n> ');
+			GuildData.Settings.channels.forEach(element => list = list + interaction.guild.channels.resolve(element).name + '\n> ');
 			list = list.slice(0, -2);
 			let channelList = '__**Whitelisted Channels:**__ \n> ' + list;
 			list = '[';
@@ -63,7 +63,7 @@ module.exports = {
 				interaction.channel.send('🤡 No channels given, please provide at least one channel');
 				return;
 			}
-			channels = functions.channelToID(channels, interaction);
+			channels = await Promise.all(channels.map(async (channel) => interaction.guild.channels.resolve(channel)));
 			const bannedChannelTypes = ['GUILD_VOICE', 'GUILD_STAGE_VOICE'];
 			if (!channels.every(ch => {
 				const LookUpChannel = interaction.guild.channels.cache.find(channel => channel.id === ch);
@@ -74,9 +74,9 @@ module.exports = {
 				return;
 			}
 			else {
-				channels.forEach(ch => GuildData.Settings.channels = functions.arrayToggle(GuildData.Settings.channels, ch));
+				channels.forEach(ch => GuildData.Settings.channels = arrayToggle(GuildData.Settings.channels, ch));
 				interaction.channel.send('Channel Whitelist updated');
-				functions.liofaUpdate(interaction, GuildData);
+				liofaUpdate(interaction, GuildData);
 			}
 		}
 		// Remove words or phrases from the whitelist
@@ -86,10 +86,10 @@ module.exports = {
 				return;
 			}
 			for (let i = 0; i < ignore.length; i++) {
-				GuildData.Settings.channelIgnore = functions.arrayToggle(GuildData.Settings.channelIgnore, ignore[i]);
+				GuildData.Settings.channelIgnore = arrayToggle(GuildData.Settings.channelIgnore, ignore[i]);
 			}
 			interaction.channel.send('Channel names to ignore updated');
-			functions.liofaUpdate(interaction, GuildData);
+			liofaUpdate(interaction, GuildData);
 		}
 	},
 

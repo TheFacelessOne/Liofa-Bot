@@ -1,6 +1,11 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const functions = require('../functions.js');
+const {
+	arrayToggle,
+	liofaRead,
+	liofaPrefixCheck,
+	liofaUpdate
+} = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -10,10 +15,10 @@ module.exports = {
 
 	usage: '<words to add to the whitelist>',
 	async execute(message) {
-		const GuildData = functions.liofaRead(message.guild.id);
+		const GuildData = liofaRead(message.guild.id);
 		const prefix = GuildData.Settings.prefix;
 		let words = [];
-		if (functions.liofaPrefixCheck(message)) {
+		if (liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
 			args.shift();
 			words = args;
@@ -26,7 +31,7 @@ module.exports = {
 		}
 		else {
 			let list = '[';
-			functions.liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
+			liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
 			list = list.slice(0, -3);
 			const whiteEmbed = new EmbedBuilder()
 				.setColor('#e1c4ff')
@@ -41,7 +46,7 @@ module.exports = {
 			let response = '';
 			for (let i = 0; i < toggleList.length; i++) {
 				const listLength = GuildData.Settings.whitelist.length;
-				GuildData.Settings.whitelist = functions.arrayToggle(GuildData.Settings.whitelist, toggleList[i]);
+				GuildData.Settings.whitelist = arrayToggle(GuildData.Settings.whitelist, toggleList[i]);
 				if (listLength > GuildData.Settings.whitelist.length) {
 					response = response + '\n❌ `[' + words[i] + ']` removed from whitelist';
 				}
@@ -59,7 +64,7 @@ module.exports = {
 				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
 			interaction.reply({ embeds : [togglelistEmbed] });
 			commandReply.delete();
-			functions.liofaUpdate(interaction, GuildData);
+			liofaUpdate(interaction, GuildData);
 		}
 	},
 };

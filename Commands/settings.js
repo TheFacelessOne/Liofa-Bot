@@ -1,8 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
-const functions = require('../functions.js');
-const bold = functions.boldText;
+const { boldText, liofaRead, liofaPrefixCheck, arrayToggle, minsToMilli, liofaUpdate} = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -27,10 +26,10 @@ module.exports = {
 
 	usage: '[list <option> | [edit [prefix [new prefix] | languages [language code] | time [minutes] | warnings [warning count] | startwarnings [allowed messages]]',
 	execute(interaction) {
-		const GuildData = functions.liofaRead(interaction.guild.id);
+		const GuildData = liofaRead(interaction.guild.id);
 		let inputs = [];
 
-		if (functions.liofaPrefixCheck(interaction)) {
+		if (liofaPrefixCheck(interaction)) {
 			inputs = interaction.content.split(' ');
 			inputs.shift();
 		}
@@ -58,16 +57,16 @@ module.exports = {
 					.setTitle('Settings')
 					.addFields(
 						{ name : 'State', value : stateEmoji, inline : true },
-						{ name : 'Whitelist contains', value : bold(GuildData.Settings.whitelist.length) + ' entries', inline : true },
-						{ name : 'Languages contains', value : bold(GuildData.Settings.languages.length) + ' accepted languages', inline : true },
+						{ name : 'Whitelist contains', value : boldText(GuildData.Settings.whitelist.length) + ' entries', inline : true },
+						{ name : 'Languages contains', value : boldText(GuildData.Settings.languages.length) + ' accepted languages', inline : true },
 						{ name: '\u200B', value: '\u200B' },
-						{ name : 'Infractions ignored after', value : bold(infractionsIgnoredAfter) + ' minutes', inline : true },
-						{ name : 'Messages before warning', value : bold(GuildData.Settings.startwarnings) + ' messages allowed', inline : true },
-						{ name : 'Maximum warnings', value : bold(GuildData.Settings.warnings) + ' warnings given', inline : true },
+						{ name : 'Infractions ignored after', value : boldText(infractionsIgnoredAfter) + ' minutes', inline : true },
+						{ name : 'Messages before warning', value : boldText(GuildData.Settings.startwarnings) + ' messages allowed', inline : true },
+						{ name : 'Maximum warnings', value : boldText(GuildData.Settings.warnings) + ' warnings given', inline : true },
 						{ name: '\u200B', value: '\u200B' },
-						{ name : 'Whitelisted channels', value : bold(GuildData.Settings.channels.length) + ' channels', inline : true },
-						{ name : 'Ignored channel keywords', value : bold(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
-						{ name : 'Prefix', value : bold(GuildData.Settings.prefix), inline : true },
+						{ name : 'Whitelisted channels', value : boldText(GuildData.Settings.channels.length) + ' channels', inline : true },
+						{ name : 'Ignored channel keywords', value : boldText(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
+						{ name : 'Prefix', value : boldText(GuildData.Settings.prefix), inline : true },
 					)
 					.setFooter({ text : 'Settings listed are for ' + interaction.guild.id });
 				return interaction.reply({ embeds : [listEmbed] });
@@ -96,7 +95,7 @@ module.exports = {
 				break;
 
 			case 'languages':
-				GuildData.Settings.languages = functions.arrayToggle(GuildData.Settings.languages, args[2]);
+				GuildData.Settings.languages = arrayToggle(GuildData.Settings.languages, args[2]);
 				interaction.reply('Accepted Language codes now contains: \n' + GuildData.Settings.languages);
 				break;
 
@@ -105,7 +104,7 @@ module.exports = {
 					return interaction.reply('Please provide a number in minutes for the length of time to keep track of the last infraction');
 				}
 				else {
-					GuildData.Settings.time = functions.minsToMilli(args[2]);
+					GuildData.Settings.time = minsToMilli(args[2]);
 					interaction.reply(args[2] + ' minutes will be allowed before a user\'s infractions are reset');
 				}
 				break;
@@ -131,7 +130,7 @@ module.exports = {
 			default:
 				return interaction.reply('No acceptable arguments were given. \n Acceptable arguments include "list, prefix, languages, time, warnings, startwarnings"');
 			}
-			functions.liofaUpdate(interaction, GuildData);
+			liofaUpdate(interaction, GuildData);
 		}
 	},
 };
