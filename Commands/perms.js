@@ -1,18 +1,18 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
 const fs = require('fs');
-const functions = require('../functions.js');
+const { liofaRead, liofaPrefixCheck, capitalizeFirstLetter, arrayToggle, liofaUpdate } = require('../functions.js');
 const Exp = [new RegExp('{'), new RegExp('],', 'g'), new RegExp('\\[', 'g'), new RegExp('"', 'g'), new RegExp(']', 'g'), new RegExp(':', 'g'), new RegExp(',', 'g'), new RegExp('}', 'g')];
 const repl = ['', '\n', '', '', '', ' : ', ', ', '', ''];
 const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
 
 async function displayPerms(interaction, permToDisplay) {
-	const GuildData = functions.liofaRead(interaction.guild.id);
+	const GuildData = liofaRead(interaction.guild.id);
 	let list = '';
 	if (permToDisplay === 'all') {
 		for (const [value] of Object.entries(GuildData.Permissions)) {
 			for (let i = GuildData.Permissions[value].length - 1; i >= 0; i--) {
-				GuildData.Permissions[value][i] = functions.roleToString(GuildData.Permissions[value][i], interaction);
+				GuildData.Permissions[value][i] = interaction.guild.roles.resolve(GuildData.Permissions[value][i]).name;
 			}
 		}
 		list = JSON.stringify(GuildData.Permissions);
@@ -22,14 +22,14 @@ async function displayPerms(interaction, permToDisplay) {
 	}
 	else {
 		for (let i = GuildData.Permissions[permToDisplay].length - 1; i >= 0; i--) {
-			GuildData.Permissions[permToDisplay][i] = functions.roleToString(GuildData.Permissions[permToDisplay][i], interaction);
+			GuildData.Permissions[permToDisplay][i] = interaction.guild.roles.resolve(GuildData.Permissions[permToDisplay][i]).name;
 		}
 		list = JSON.stringify(GuildData.Permissions[permToDisplay]);
 		for (let i = 0; i < Exp.length; i++) {
 			list = list.replace(Exp[i], repl[i]);
 		}
 	}
-	list = '__**' + functions.capitalizeFirstLetter(permToDisplay) + ' Permissions**__ \n >>> ' + list;
+	list = '__**' + capitalizeFirstLetter(permToDisplay) + ' Permissions**__ \n >>> ' + list;
 	return list;
 }
 
@@ -59,9 +59,9 @@ module.exports = {
 
 	async execute(interaction) {
 		const inputs = interaction.options;
-		let GuildData = functions.liofaRead(interaction.guild.id);
+		let GuildData = liofaRead(interaction.guild.id);
 		let args, permission;
-		if (functions.liofaPrefixCheck(interaction)) {
+		if (liofaPrefixCheck(interaction)) {
 			args = interaction.content.split(' ');
 			args.shift();
 			permission = args.shift();
@@ -75,7 +75,7 @@ module.exports = {
 		}
 		if (args[0] && permission) {
 			await permToggle(permission, args);
-			GuildData = functions.liofaRead(interaction.guild.id);
+			GuildData = liofaRead(interaction.guild.id);
 		}
 		else if (args[0] || permission) {
 			interaction.channel.send('🤡 Please provide a permission AND a role if you would like to edit the permissions');
@@ -103,7 +103,7 @@ module.exports = {
 			}
 			// Used for toggling what roles can use what commands
 			else {
-				roles = functions.roleToID(roles, interaction);
+				roles = await Promise.all(roles.map(async (role) => interaction.guild.roles.resolve(role).id))
 
 				if (!roles.every(role => interaction.guild.roles.cache.has(role))) return interaction.reply('One or more of the given roles do not exist');
 
@@ -111,16 +111,16 @@ module.exports = {
 				const message = await interaction.channel.send('Editing Permissions...');
 				for (let i = 0; i < roles.length; i++) {
 					const permLength = GuildData.Permissions[perm].length;
-					GuildData.Permissions[perm] = functions.arrayToggle(GuildData.Permissions[perm], roles[i]);
+					GuildData.Permissions[perm] = arrayToggle(GuildData.Permissions[perm], roles[i]);
 					if (permLength > GuildData.Permissions[perm].length) {
-						response = response + '\n❌ ' + functions.roleToString(roles[i], interaction) + ' removed from ' + perm;
+						response = response + '\n❌ ' + interaction.guild.roles.resolve(roles[i]).name + ' removed from ' + perm;
 					}
 					else {
-						response = response + '\n✅ ' + functions.roleToString(roles[i], interaction) + ' added to ' + perm;
+						response = response + '\n✅ ' + interaction.guild.roles.resolve(roles[i]).name + ' added to ' + perm;
 					}
 				}
 				message.edit(response);
-				functions.liofaUpdate(interaction, GuildData);
+				liofaUpdate(interaction, GuildData);
 
 			}
 		}
@@ -133,7 +133,7 @@ module.exports = {
 			}];
 			for (const [value] of Object.entries(Data.Permissions)) {
 				menuOptions.push({
-					label: functions.capitalizeFirstLetter(value),
+					label: capitalizeFirstLetter(value),
 					value: 'perms info ' + value,
 				});
 			}

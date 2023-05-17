@@ -1,20 +1,19 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
-const functions = require('../functions.js');
-const bold = functions.boldText;
+const { minutesSince, liofaRead, boldText, liofaPrefixCheck, liofaUpdate, liofaMod } = require('../functions.js');
 
 
 async function displayInfractions(interaction, target) {
-	const GuildData = functions.liofaRead(interaction.guild.id);
-	const timeSinceLastInfraction = functions.minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
+	const GuildData = liofaRead(interaction.guild.id);
+	const timeSinceLastInfraction = minutesSince(Date.now(), GuildData.Watchlist[target.id].time);
 	const warningCount = GuildData.Watchlist[target.id].warnings;
 
 	const infractionsEmbed = new EmbedBuilder()
 		.setColor(0xa60000)
-		.setTitle(bold(target.username))
+		.setTitle(boldText(target.username))
 		.addFields(
-			{ name : 'Minutes since last infraction', value : bold(timeSinceLastInfraction)},
-			{ name : 'Warnings given', value : bold(warningCount)})
+			{ name : 'Minutes since last infraction', value : boldText(timeSinceLastInfraction)},
+			{ name : 'Warnings given', value : boldText(warningCount)})
 		.setThumbnail('https://cdn.discordapp.com/avatars/' + target.id + '/' + target.avatar + '.png')
 		.setFooter({ text : 'Settings listed are for ' + interaction.guild.id });
 	return infractionsEmbed;
@@ -43,12 +42,11 @@ module.exports = {
 	usage: '[user]',
 
 	async execute(message) {
-		const GuildData = functions.liofaRead(message.guild.id);
+		const GuildData = liofaRead(message.guild.id);
 		let target;
-		if (functions.liofaPrefixCheck(message)) {
+		if (liofaPrefixCheck(message)) {
 			const args = message.content.split(' ');
-			target = await message.guild.members.fetch(functions.userToID(args[1], message));
-			target = target.user;
+			target = await message.guild.members.resolve(args[1]).user;
 			if (typeof target === 'undefined') return;
 		}
 		else {
@@ -72,34 +70,31 @@ module.exports = {
 	},
 	buttons : {
 		'reset' : async function reset(interaction, name) {
-			const GuildData = functions.liofaRead(interaction.guild.id);
-			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
-			target = target.user;
+			const GuildData = liofaRead(interaction.guild.id);
+			let target = await interaction.guild.members.resolve(name[2]).user;
 			if (typeof target === 'undefined') return;
 			GuildData.Watchlist[target.id].warnings = 0;
 			const message = await interaction.message.fetch();
 			message.delete();
 			interaction.channel.send(target.username + '\'s infractions have been reset');
-			functions.liofaUpdate(interaction, GuildData);
+			liofaUpdate(interaction, GuildData);
 			return;
 		},
 		'undo' : async function undo(interaction, name) {
-			const GuildData = functions.liofaRead(interaction.guild.id);
-			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
-			target = target.user;
+			const GuildData = liofaRead(interaction.guild.id);
+			let target = await interaction.guild.members.resolve(name[2]).user;
 			if (typeof target === 'undefined') return;
 			if (GuildData.Watchlist[target.id].warnings <= 0) return interaction.reply({ content : '🛑 User already has less than 1 infraction', ephemeral : true });
 			GuildData.Watchlist[target.id].warnings--;
-			functions.liofaUpdate(interaction, GuildData);
+			liofaUpdate(interaction, GuildData);
 			const message = await interaction.message.fetch();
 			message.delete();
 			return interaction.reply({ content : target.username + ' has one less infraction', ephemeral : true });
 		},
 		'increase' : async function increase(interaction, name) {
-			let target = await interaction.guild.members.fetch(functions.userToID(name[2], interaction));
-			target = target.user;
+			let target = await interaction.guild.members.resolve(name[2]).user;
 			if (typeof target === 'undefined') return;
-			functions.liofaMod(interaction, target.id);
+			liofaMod(interaction, target.id);
 			const message = await interaction.message.fetch();
 			message.delete();
 			interaction.reply({ embeds: [await displayInfractions(interaction, target)], components: [await modButtons(false, target)] });

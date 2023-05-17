@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
-const functions = require('../functions.js');
+const { liofaRead, liofaPrefixCheck } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,11 +20,11 @@ module.exports = {
 	everyone: true,
 
 	async execute(interaction) {
-		const GuildData = functions.liofaRead(interaction.guild.id);
+		const GuildData = liofaRead(interaction.guild.id);
 		const prefix = GuildData.Settings.prefix;
 		const inputs = interaction.options;
 		let comm;
-		if (functions.liofaPrefixCheck(interaction)) {
+		if (liofaPrefixCheck(interaction)) {
 			const args = interaction.content.split(' ');
 			comm = args[1];
 		}

@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const functions = require('../functions.js');
+const { liofaRead, liofaUpdate } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -13,7 +13,7 @@ module.exports = {
 
 	async execute(interaction) {
 		let transEmoji, langEmoji, undoEmoji, getEmoji;
-		const GuildData = functions.liofaRead(interaction.guild.id);
+		const GuildData = liofaRead(interaction.guild.id);
 		const buttons = await [interaction.options.getBoolean('translator'), interaction.options.getBoolean('language'), interaction.options.getBoolean('undo'), interaction.options.getBoolean('get')];
 		for (let i = 0; i < buttons.length; i++) {
 			if (typeof buttons[i] !== 'boolean') {
@@ -21,7 +21,7 @@ module.exports = {
 			}
 		}
 		GuildData.Settings.buttons = buttons;
-		await functions.liofaUpdate(interaction, GuildData);
+		liofaUpdate(interaction, GuildData);
 		GuildData.Settings.buttons[0] ? transEmoji = '✅' : transEmoji = '❌';
 		GuildData.Settings.buttons[1] ? langEmoji = '✅' : langEmoji = '❌';
 		GuildData.Settings.buttons[2] ? undoEmoji = '✅' : undoEmoji = '❌';
