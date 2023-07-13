@@ -1,9 +1,9 @@
 {
-    "Version" : "2.5.1",
+    "Version" : "2.5.2",
     "Settings": {
       "state": true,
       "whitelist": [],
-      "languages": [      
+      "languages": [
         "en",
         "sco",
         "ie"
@@ -14,7 +14,8 @@
       "channels": [],
       "channelIgnore": [],
       "prefix": "&",
-      "buttons": [true, true, true, true]
+      "buttons": [true, true, true, true],
+      "modlog": null
     },
     "Permissions": {
       "toggle": [],
@@ -27,7 +28,8 @@
       "channels": [],
       "help": [],
       "invite": [],
-      "buttons": []
+      "buttons": [],
+      "modlog": []
     },
     "Watchlist": {}
   }
