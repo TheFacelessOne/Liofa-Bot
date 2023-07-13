@@ -24,6 +24,7 @@ module.exports = {
 	boldText };
 const cld = require('cld');
 const fs = require('fs');
+const { PermissionsBitField } = require('discord.js');
 
 // Check for Language
 async function liofaCheck(msg) {
@@ -231,7 +232,7 @@ function liofaPrefixCheck(msg) {
 
 function liofaPermsCheck(msg, command) {
 	const GuildData = liofaRead(msg.guild.id);
-	const isAdmin = msg.member.permissions.has('ADMINISTRATOR');
+	const isAdmin = msg.member.permissions.has([PermissionsBitField.Flags.Administrator]);
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
 	const everyoneCanUse = command.everyone;
 	const isBotDev = ((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER));

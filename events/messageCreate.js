@@ -63,6 +63,11 @@ module.exports = {
 					msg.reply('<@' + msg.author.id + '> All further messages will be deleted unless you speak in English');
 				}
 				else if (warnCount > msgBeforeDeletion) {
+					const channelId = GuildData.Settings.modlog;
+					//Check if modlog is set and channel exists
+					if (channelId != null && msg.client.channels.cache.has(channelId)){
+    				const channel = msg.client.channels.cache.get(channelId);
+						channel.send({ embeds: [await modLog(msg, warnCount)]});}
 					msg.delete();
 				}
 			}
