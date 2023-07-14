@@ -1,5 +1,5 @@
 const functions = require('../functions.js');
-const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
 	name: 'MessageCreate',
@@ -66,6 +66,16 @@ module.exports = {
 					const channelId = GuildData.Settings.modlog;
 					//Check if modlog is set and channel exists
 					if (channelId != null && msg.client.channels.cache.has(channelId)){
+						function modLog(interaction, warnings) {
+							const modlogEmbed = new EmbedBuilder()
+								.setColor(0xa60000)
+								.setAuthor({ name: interaction.author.username, iconURL: 'https://cdn.discordapp.com/avatars/' + interaction.author.id + '/' + interaction.author.avatar + '.png'})
+								.setTitle('Message Deleted')
+								.addFields(
+									{ name : 'Message:', value : interaction.content},
+									{ name : 'Warnings given:', value : functions.boldText(warnings)});
+							return modlogEmbed;
+								}
     				const channel = msg.client.channels.cache.get(channelId);
 						channel.send({ embeds: [await modLog(msg, warnCount)]});}
 					msg.delete();

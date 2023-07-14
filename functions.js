@@ -231,6 +231,7 @@ function liofaPrefixCheck(msg) {
 }
 
 function liofaPermsCheck(msg, command) {
+	liofaJoin(msg.guild.id);
 	const GuildData = liofaRead(msg.guild.id);
 	const isAdmin = msg.member.permissions.has([PermissionsBitField.Flags.Administrator]);
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));

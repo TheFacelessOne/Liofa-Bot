@@ -1,18 +1,41 @@
-const fs = require('fs');
+const { REST, Routes } = require('discord.js');
+const fs = require('node:fs');
 require('dotenv').config();
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const path = require('node:path');
 
 const commands = [];
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+// Grab all the command files from the commands directory you created earlier
+const folderPath = path.join(__dirname, 'Commands');
+const commandFiles = fs.readdirSync(folderPath);
+
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	commands.push(command.data.toJSON());
+	const filePath = path.join(folderPath, file);
+	const command = require(filePath);
+	if ('data' in command && 'execute' in command) {
+		commands.push(command.data.toJSON());
+	} else {
+		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+	}
 }
 
-const rest = new REST({ version: '9' }).setToken(process.env.BOTTOKEN);
+// Construct and prepare an instance of the REST module
+const rest = new REST().setToken(process.env.DEVTOKEN);
 
-rest.put(Routes.applicationGuildCommands(process.env.CLIENTID, process.env.DEVSERVERID), { body: commands })
-	.then(() => console.log('Successfully registered application commands.'))
-	.catch(console.error);
+// and deploy your commands!
+(async () => {
+	try {
+		console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+		// The put method is used to fully refresh all commands in the guild with the current set
+		const data = await rest.put(
+			Routes.applicationCommands(process.env.DEVCLIENTID),
+			{ body: commands },
+		);
+
+		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+	} catch (error) {
+		// And of course, make sure you catch and log any errors!
+		console.error(error);
+	}
+})();
