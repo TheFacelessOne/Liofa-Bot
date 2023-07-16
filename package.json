@@ -26,10 +26,12 @@
   },
   "homepage": "https://github.com/TheFacelessOne/Liofa-Bot#readme",
   "dependencies": {
+    "better-sqlite3": "^8.4.0",
     "cld": "^2.9.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "node-gyp": "^9.3.1"
   },
   "devDependencies": {
     "eslint": "^8.40.0"

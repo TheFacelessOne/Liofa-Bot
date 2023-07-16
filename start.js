@@ -40,5 +40,5 @@ for (const file of eventFiles) {
 		client.on(Events[event.name], (...args) => event.execute(...args));
 	}
 }
-
-client.login(process.env.DEVTOKEN).then(console.log('Liofa\'s ears perk up'));
+console.group('Liofa\'s alarm is ringing');
+client.login(process.env.DEVTOKEN).then(console.log('Liofa logged in'));
