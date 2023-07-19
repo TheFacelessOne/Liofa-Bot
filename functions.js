@@ -1,5 +1,4 @@
 module.exports = {
-	liofaDetectLanguage,
 	minutesSince,
 	minsToMilli,
 	arrayToggle,
@@ -11,37 +10,10 @@ module.exports = {
 	onlyOne,
 	liofaUpdate,
 	capitalizeFirstLetter,
-	liofaMod,
+	watchlistIncrement,
 	boldText };
-const cld = require('cld');
 const fs = require('fs');
 const { PermissionsBitField } = require('discord.js');
-
-// Check for Language
-async function liofaDetectLanguage(msg) {
-	
-	// Removes Emojis
-	let MessageContent = msg.content.replace(new RegExp('\<a?\:[^ \>]+\>', 'g'), ' ');
-	
-	// Removes an array of words from a string
-	filterOut = liofaRead(msg.guild.id).Settings.whitelist
-	if (filterOut.length > 0) {
-		const regex = new RegExp(filterOut.join('|'), 'gi');
-		MessageContent.replace(regex, ' ');
-	}
-	if (!/\S/.test(MessageContent) || MessageContent.length < 6) {
-		return false;
-	}
-
-	try {
-		const result = await cld.detect(MessageContent);
-		return result.languages[0];
-	}
-	catch {
-		console.error('Language detection failed on: \n\t' + MessageContent);
-		return false;
-	}
-}
 
 // Given two times, gives you the difference between them in minutes
 function minutesSince(bigTime, littleTime) {
@@ -124,27 +96,21 @@ function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-// Check Warning Status
-function liofaMod(interaction, target) {
+// Check and increase Warnings
+function watchlistIncrement(interaction, target) {
 	target = interaction.guild.members.resolve(target).user.id;
-	const GuildData = liofaRead(interaction.guild.id);
-	let UserRef = GuildData['Watchlist'][target];
+	const db = interaction.client.dbFunctions;
+	const dbRequest = db.getWatchlist(interaction.guild.id, target);
+	let { infractions, time } = dbRequest || {infractions : 0, time : -1};
 
-	if (typeof UserRef === 'undefined') {
-		UserRef = { warnings : 1, time : Date.now() };
-	}
-	else if ((Date.now() - UserRef.time) < GuildData.Settings.time) {
-		UserRef.warnings++;
-		UserRef.time = Date.now();
+	const infractionTimeout = db.getGuildData('SETTINGS', interaction.guild.id, 'infraction_length');
+	const infractionsHaveTimedOut = (Date.now() - Date.parse(time)) > infractionTimeout;
 
-	}
-	else {
-		UserRef = { warnings : 1, time : Date.now() };
-
-	}
-	GuildData['Watchlist'][target] = UserRef;
-	liofaUpdate(interaction, GuildData);
-	return UserRef.warnings;
+	if (infractionsHaveTimedOut) { infractions = 0 }
+	
+	infractions++;
+	db.updateWatchlist(interaction.guild.id, target, infractions);
+	return infractions;
 }
 
 function boldText(string) {

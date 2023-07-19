@@ -1,6 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { ActionRowBuilder, ButtonBuilder, EmbedBuilder, ButtonStyle } = require('discord.js');
-const { minutesSince, liofaRead, boldText, liofaPrefixCheck, liofaUpdate, liofaMod } = require('../functions.js');
+const { minutesSince, liofaRead, boldText, liofaPrefixCheck, liofaUpdate, watchlistIncrement } = require('../functions.js');
 
 
 async function displayInfractions(interaction, target) {
@@ -94,7 +94,7 @@ module.exports = {
 		'increase' : async function increase(interaction, name) {
 			let target = await interaction.guild.members.resolve(name[2]).user;
 			if (typeof target === 'undefined') return;
-			liofaMod(interaction, target.id);
+			watchlistIncrement(interaction, target.id);
 			const message = await interaction.message.fetch();
 			message.delete();
 			interaction.reply({ embeds: [await displayInfractions(interaction, target)], components: [await modButtons(false, target)] });

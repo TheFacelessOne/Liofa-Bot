@@ -1,130 +1,144 @@
 const {
-	liofaDetectLanguage,
-	liofaRead,
-	liofaPrefixCheck,
-	liofaPermsCheck,
 	liofaExcludedRolesOrChannels,
-	liofaMod,
+	watchlistIncrement,
 	boldText
 } = require('../functions.js');
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const cld = require('cld');
 
 module.exports = {
 	name: 'MessageCreate',
 	async execute(msg) {
-		if (runLiofa(msg) === false) return;
+		const {
+			approved_languages : languagesAllowed,
+			warnings_given : warningsGiven,
+			start_warnings : infractionsBeforeWarning,
+			button_translate : Btn0,
+			button_vote : Btn1,
+			button_undo : Btn2,
+			button_support : Btn3,
+			modlog_channel_id : modLogChannel,
+			ignored_words : ignoreTheseWords
+		} = msg.client.dbFunctions.getGuildData('SETTINGS', msg.guild.id);
 
-		const result = await liofaDetectLanguage(MessageContent);
-		if (!result) return;
+		Promise.all([isLiofaListening(msg), filterAndDetectLanguage(msg, JSON.parse(ignoreTheseWords))]).then( (result) => {
 
-
-		const GuildData = liofaRead(msg.guild.id);
-		// Checks list of allowed languages
-		if (!GuildData.Settings.languages.includes(result.code) && parseInt(result.percent) >= 90) {
-
-			// Warnings Check
-			const warnCount = liofaMod(msg, msg.author.id);
-			const msgBeforeDeletion = parseInt(GuildData.Settings.warnings) + parseInt(GuildData.Settings.startwarnings);
-			if (warnCount < msgBeforeDeletion && warnCount > GuildData.Settings.startwarnings) {
-				const buttons = new ActionRowBuilder();
-				let printButtons = false;
-				if (GuildData.Settings.buttons.includes(true)) {
-					printButtons = true;
-					if (GuildData.Settings.buttons[0]) {
-						buttons.addComponents(new ButtonBuilder().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle(ButtonStyle.Link));
-					}
-					if (GuildData.Settings.buttons[1]) {
-						buttons.addComponents(new ButtonBuilder().setCustomId('result.name').setLabel(result.name + ' [' + result.percent + '%]').setStyle(ButtonStyle.Primary).setDisabled(true));
-					}
-					if (GuildData.Settings.buttons[2]) {
-						buttons.addComponents(new ButtonBuilder().setCustomId('mod undo ' + msg.author.id).setLabel('Undo').setStyle(ButtonStyle.Danger));
-					}
-					if (GuildData.Settings.buttons[3]) {
-						buttons.addComponents(new ButtonBuilder().setCustomId('invite links').setLabel('Get Liofa!').setStyle(ButtonStyle.Success));
-					}
+			const detectedLanguage = result[1];
+			const showButton = [Btn0, Btn1, Btn2, Btn3];
+			const languageIsAllowed = JSON.parse(languagesAllowed).includes(detectedLanguage.code);
+			const resultIsAccurate = parseInt(detectedLanguage.percent) >= 90; // must be 90% sure
+	
+			if (!languageIsAllowed && resultIsAccurate) {
+	
+				// Warnings Check
+				const infractionCount = watchlistIncrement(msg, msg.author.id);
+				const infractionsBeforeDeletion = warningsGiven + infractionsBeforeWarning;
+				const startDeleting = infractionCount > infractionsBeforeDeletion;
+				const startWarnings = infractionCount > infractionsBeforeWarning;
+				
+				const buttons = createButtons(showButton, msg);
+				
+				if (!startDeleting && startWarnings) {
+					sendWarning(msg, buttons, detectedLanguage);
 				}
-
-				const LiofaMessages = require('../Read Only/Responses');
-				// Checks if output for given language is available
-				if (typeof LiofaMessages[result.code] === 'string') {
-					if (printButtons) {
-						msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**', components : [buttons] });
-					}
-					else {
-						msg.reply({ content : '<@' + msg.author.id + '> **' + LiofaMessages[result.code] + '**' });
-					}
+				else if (infractionCount == startDeleting) {
+					const lastWarning = { content : '<@' + msg.author.id + '> All further messages will be deleted unless you speak in English'};
+					if (buttons) lastWarning.components = [buttons];
+					msg.reply(lastWarning);
 				}
-				else {
-					if (printButtons) {
-						msg.reply({ content : '**Please speak English.**', components : [buttons] });
-					}
-					else {
-						msg.reply({ content : '**Please speak English.**' });
-					}
-					msg.channel.send(result.name + ' must be added to Languages. Please report this bug on my support server A link can be found in my bio. code: `[' + result.code + ']`');
-				}
-			}
-			else if (warnCount == msgBeforeDeletion) {
-				msg.reply('<@' + msg.author.id + '> All further messages will be deleted unless you speak in English');
-			}
-			else if (warnCount > msgBeforeDeletion) {
-					const channelId = GuildData.Settings.modlog;
+				else if (startDeleting) {
 					//Check if modlog is set and channel exists
-					if (channelId != null && msg.client.channels.cache.has(channelId)){
-						function modLog(interaction, warnings) {
-							const modlogEmbed = new EmbedBuilder()
-								.setColor(0xa60000)
-								.setAuthor({ name: interaction.author.username, iconURL: 'https://cdn.discordapp.com/avatars/' + interaction.author.id + '/' + interaction.author.avatar + '.png'})
-								.setTitle('Message Deleted')
-								.addFields(
-									{ name : 'Message:', value : interaction.content},
-									{ name : 'Warnings given:', value : boldText(warnings)});
-							return modlogEmbed;
-								}
-    				const channel = msg.client.channels.cache.get(channelId);
-						channel.send({ embeds: [await modLog(msg, warnCount)]});}
-				msg.delete();
+					if (modLogChannel && msg.client.channels.cache.has(modLogChannel)){
+						const log = msg.client.channels.cache.get(modLogChannel);
+						log.send({ embeds: [modLog(msg, infractionCount)]});}
+					msg.delete();
+				}
 			}
-		}
+		}).catch( (error) => { console.error(error) });
+
+
 	
 
-		function runLiofa(txt) {
+		function isLiofaListening(txt) {
 			// Checks if it's a Bot
-			if (txt.author.bot === true) return false;
-			const GuildData = liofaRead(txt.guild.id);
-
-			if (liofaPrefixCheck(txt)) {
-				const args = txt.content.slice(GuildData.Settings.prefix.length).trim().split(' ');
-
-				// Checks command exists
-				const command = txt.client.commands.get(args.shift().toLowerCase());
-				if (!command) return true;
-
-				// Checks required channel permissions
-				if(!txt.channel.permissionsFor(txt.guild.me).has(['VIEW_CHANNEL', 'SEND_MESSAGES', 'MANAGE_MESSAGES'])){
-					txt.author.send('I don\'t have sufficient permissions required to run the command in that channel\!😭\nPlease ensure I have these channel permissions:\n > **View Channel**\n > **Send Messages**\n > **Manage Messages**');
-					return false;
-				}
-
-				try {
-					// Checks you have permission to run the command
-					if (liofaPermsCheck(txt, command)) {
-						command.execute(txt);
-					}
-					else {
-						txt.reply({ content : 'You have insufficient permissions 😬', ephemeral : true });
-					}
-					return false;
-				}
-				catch (error) {
-					console.error(error);
-					txt.reply('Something went wrong! 😲');
-				}
-			}
-			else if (liofaExcludedRolesOrChannels(txt)) {
-				return false;
-			}
-			return GuildData.Settings.state;
+			if (txt.author.bot === true) return Promise.reject();
+			if (liofaExcludedRolesOrChannels(txt)) return Promise.reject();
+			if (txt.client.dbFunctions.getGuildData('SETTINGS', txt.guild.id, 'state')) return Promise.resolve();
 		}
 	},
 };
+
+function createButtons(showButton, msg) {
+	const buttons = new ActionRowBuilder()
+	if (showButton.includes(true)) {
+		if (showButton[0]) {
+			buttons.addComponents( new ButtonBuilder().setURL('https://translate.google.com').setLabel('🌍 Translator').setStyle(ButtonStyle.Link));
+		}
+		if (showButton[1]) {
+			buttons.addComponents( new ButtonBuilder().setURL('https://top.gg/bot/866186816645890078/vote').setLabel('⬆ Vote').setStyle(ButtonStyle.Link));
+		}
+		if (showButton[2]) {
+			buttons.addComponents( new ButtonBuilder().setCustomId('mod undo ' + msg.author.id).setLabel('⏪ Undo').setStyle(ButtonStyle.Danger));
+		}
+		if (showButton[3]) {
+			buttons.addComponents( new ButtonBuilder().setCustomId('invite links').setLabel('🆘 Support').setStyle(ButtonStyle.Primary));
+		}
+		return buttons;
+	}
+	
+	return false;
+
+}
+
+function sendWarning(msg, buttons, detectedLanguage) {
+	const LiofaMessages = require('../Read Only/Responses');
+	const response = {};
+	// Checks if output for given language is available
+	if (typeof LiofaMessages[detectedLanguage.code] === 'string') {
+		response.content = '<@' + msg.author.id + '> **' + LiofaMessages[detectedLanguage.code] + '**';
+		if (buttons) { response.components = [buttons] }
+	}
+	else {
+		response.content = '**Please speak English.**';
+		if (buttons) { response.components = [buttons] }
+		msg.channel.send(detectedLanguage.name + ' must be added to Languages. Please report this bug on my support server A link can be found in my bio. code: `[' + detectedLanguage.code + ']`');
+	}
+	return msg.reply(response);
+}
+
+function modLog(interaction, infractions) {
+	const modlogEmbed = new EmbedBuilder()
+		.setColor(0xa60000)
+		.setAuthor({ name: interaction.author.username, iconURL: 'https://cdn.discordapp.com/avatars/' + interaction.author.id + '/' + interaction.author.avatar + '.png'})
+		.setTitle('Message Deleted')
+		.addFields(
+			{ name : 'Message:', value : interaction.content},
+			{ name : 'Warnings given:', value : boldText(infractions)});
+	return modlogEmbed;
+}
+
+// Check for Language
+async function filterAndDetectLanguage(msg, filterOut) {
+	
+	// Removes Emojis
+	// eslint-disable-next-line no-useless-escape
+	let MessageContent = msg.content.replace(new RegExp('\<a?\:[^ \>]+\>', 'g'), ' ');
+	
+	// Removes an array of words from a string
+	if (filterOut.length > 0) {
+		const regex = new RegExp(filterOut.join('|'), 'gi');
+		MessageContent.replace(regex, ' ');
+	}
+	if (!/\S/.test(MessageContent) || MessageContent.length < 6) {
+		return Promise.reject('Message too short');
+	}
+
+	try {
+
+		const result = await cld.detect(MessageContent)
+		return Promise.resolve(result.languages[0]);
+	}
+	catch {
+		return Promise.reject('Language detection failed on: \n\t' + MessageContent);
+	}
+}
