@@ -12,9 +12,13 @@ module.exports = {
 		client.dbFunctions = prepDatabaseFunctions();
 		let guildCount = 0;
 
+		const connectedGuilds = db.prepare('SELECT guild_id FROM SETTINGS;').all().map(row => row.guild_id);
+		console.log(typeof connectedGuilds[0]);
+
+
 		// .map allows for async updates on each file
 		await Promise.all(client.guilds.cache.map( async (guild) => {
-			if (!client.dbFunctions.getGuildData('SETTINGS', guild.id)) {
+			if (!connectedGuilds.includes(Number(guild.id))) {
 				client.dbFunctions.addGuild(guild.id);
 			}
 			guildCount++;

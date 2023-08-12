@@ -7,7 +7,6 @@ module.exports = {
 	capitalizeFirstLetter,
 	watchlistIncrement,
 	boldText };
-const fs = require('fs');
 const { PermissionsBitField } = require('discord.js');
 
 // Given two times, gives you the difference between them in minutes
@@ -34,11 +33,21 @@ function arrayToggle(list, input) {
 }
 
 function liofaPermsCheck(msg, command) {
-	const isAdmin = msg.member.permissions.has([PermissionsBitField.Flags.Administrator]);
-	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
-	const everyoneCanUse = command.everyone;
-	const isBotDev = ((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER));
-	return isAdmin || hasPerms || everyoneCanUse || isBotDev;
+	// This returns an array where the 0th element is a string
+	let permittedRoles = Object.values(msg.client.dbFunctions.getGuildData('PERMISSIONS', msg.guild.id, command.data.name));
+
+	// This converts that string into an array
+	permittedRoles = JSON.parse(permittedRoles[0])
+
+	// This checks that at least one of these is true and continues if it is
+	return Promise.any([
+		command.everyone ? Promise.resolve() : Promise.reject('Not everyone can use this command'),
+		msg.member.permissions.has([PermissionsBitField.Flags.Administrator]) ? Promise.resolve() : Promise.reject('Is not an admin'),
+		msg.member.roles.cache.some(role => permittedRoles.includes(role.id)) ? Promise.resolve() : Promise.reject('Doesn\'t have necessary permissions'),
+		((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER)) ? Promise.resolve() : Promise.reject('is not a Developer')
+	])
+	.then( () => { return true } )
+	.catch( () => { return false } )
 }
 
 function onlyOne(arr) {
