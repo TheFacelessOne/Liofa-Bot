@@ -2,13 +2,8 @@ module.exports = {
 	minutesSince,
 	minsToMilli,
 	arrayToggle,
-	liofaRead,
-	liofaJoin,
-	liofaPrefixCheck,
 	liofaPermsCheck,
-	liofaExcludedRolesOrChannels,
 	onlyOne,
-	liofaUpdate,
 	capitalizeFirstLetter,
 	watchlistIncrement,
 	boldText };
@@ -38,43 +33,12 @@ function arrayToggle(list, input) {
 	return list;
 }
 
-function liofaRead(server) {
-	if (!fs.existsSync('./Server Data/' + server + '.json')) {
-		liofaJoin(server);
-	}
-	return JSON.parse(fs.readFileSync('./Server Data/' + server + '.json'));
-}
-
-function liofaJoin(newServer) {
-	const newServerFile = './Server Data/' + newServer + '.json';
-	if (fs.existsSync(newServerFile)) return;
-	fs.copyFileSync('./Read Only/Settings.json', newServerFile);
-	console.log('Joined new server ' + newServer.toString());
-}
-
-function liofaPrefixCheck(msg) {
-	if (msg.type === 2) return false;
-	const GuildData = liofaRead(msg.guild.id);
-	return msg.cleanContent.includes(GuildData.Settings.prefix) && msg.cleanContent.search(GuildData.Settings.prefix) == 0;
-}
-
 function liofaPermsCheck(msg, command) {
-	liofaJoin(msg.guild.id);
-	const GuildData = liofaRead(msg.guild.id);
 	const isAdmin = msg.member.permissions.has([PermissionsBitField.Flags.Administrator]);
 	const hasPerms = msg.member.roles.cache.some(role => GuildData['Permissions'][command.data.name].includes(role.id));
 	const everyoneCanUse = command.everyone;
 	const isBotDev = ((msg.member.id == process.env.BOTADMIN) && (msg.guild.id != process.env.TESTINGSERVER));
 	return isAdmin || hasPerms || everyoneCanUse || isBotDev;
-}
-
-function liofaExcludedRolesOrChannels(msg) {
-	const GuildData = liofaRead(msg.guild.id);
-	const roleIsExcluded = msg.member.roles.cache.some(ExcludedRole => GuildData.Permissions.excluded.includes(ExcludedRole.id));
-	const channelIsExcluded = GuildData.Settings.channels.includes(msg.channel.id);
-	const channelNameIsIgnored = GuildData.Settings.channelIgnore.some(ignore => msg.channel.name.includes(ignore));
-	const channelParentIsExcluded = GuildData.Settings.channels.includes(msg.channel.parentId);
-	return roleIsExcluded || channelIsExcluded || channelNameIsIgnored || channelParentIsExcluded;
 }
 
 function onlyOne(arr) {
@@ -85,11 +49,6 @@ function onlyOne(arr) {
 		}
 	}
 	return count;
-}
-
-function liofaUpdate(interaction, GuildData) {
-	fs.writeFileSync('./Server Data/' + interaction.guild.id + '.json', JSON.stringify(GuildData, null, 2));
-	console.log(interaction.guild.id.toString() + ' JSON updated');
 }
 
 function capitalizeFirstLetter(string) {
