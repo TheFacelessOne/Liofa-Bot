@@ -10,20 +10,22 @@ module.exports = {
 		.setName('toggle')
 		.setDescription('toggles Liofa'),
 	async execute(interaction) {
-		const GuildData = liofaRead(interaction.guild.id);
-		if (typeof GuildData.Settings.state == 'boolean') {
-			GuildData.Settings.state = !GuildData.Settings.state;
+		let updateState;
+		const { state: readState } = interaction.client.dbFunctions.getGuildData('SETTINGS', interaction.guild.id);
+		let boolState = Boolean(readState);
+		if (typeof boolState == 'boolean') {
+			updateState = { state: !boolState };
 		}
 		else {
-			GuildData.Settings.state = true;
+			updateState = { state: true };
 		}
-		liofaUpdate(interaction, GuildData);
-
+		interaction.client.dbFunctions.updateGuildData('SETTINGS', interaction.guild.id, updateState);
+		const { state: newState } = interaction.client.dbFunctions.getGuildData('SETTINGS', interaction.guild.id);
 		const toggleEmbed = new EmbedBuilder()
 			.setColor(0x0099ff)
-			.setDescription('Liofa is turned **' + Response[GuildData.Settings.state] + '**');
+			.setDescription('Liofa is turned **' + Response[Boolean(newState)] + '**');
 
-		GuildData.Settings.state ? toggleEmbed.setColor(0x23ee27) : toggleEmbed.setColor(0xff1818);
+		newState ? toggleEmbed.setColor(0x23ee27) : toggleEmbed.setColor(0xff1818);
 		interaction.reply({ embeds : [toggleEmbed], ephemeral: false });
 	},
 };

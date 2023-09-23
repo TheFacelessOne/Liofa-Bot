@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const Data = JSON.parse(fs.readFileSync('./Read Only/Settings.json'));
-const { liofaRead, liofaPrefixCheck } = require('../functions.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,17 +19,8 @@ module.exports = {
 	everyone: true,
 
 	async execute(interaction) {
-		const GuildData = liofaRead(interaction.guild.id);
-		const prefix = GuildData.Settings.prefix;
 		const inputs = interaction.options;
-		let comm;
-		if (liofaPrefixCheck(interaction)) {
-			const args = interaction.content.split(' ');
-			comm = args[1];
-		}
-		else {
-			comm = inputs.getString('command');
-		}
+		let comm = inputs.getString('command');
 
 		if (typeof comm != 'string') {
 			return helpList(inputs, interaction);
@@ -51,7 +41,7 @@ module.exports = {
 			if (command.data.description) {
 				helpComm.addFields({ name : '__**Description:**__', value : '> *' + command.data.description + '*' });}
 			if (command.usage) {
-				helpComm.addFields({ name : '__**Usage:**__', value : '> `' + prefix + command.data.name + command.usage + '`' });}
+				helpComm.addFields({ name : '__**Usage:**__', value : '> `/' + command.data.name + command.usage + '`' });}
 			return interaction.reply({ embeds : [helpComm] });
 		}
 //Main Embed
@@ -60,7 +50,7 @@ module.exports = {
 			for (const [value] of Object.entries(Data.Permissions)) {
 				info = info.concat(value + '\n');
 			}
-			info = info.concat(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command!`);
+			info = info.concat(`\nYou can send \`/help [command name]\` to get info on a specific command!`);
 
 			const helpEmbed = new EmbedBuilder()
 				.setColor('#ffffff')

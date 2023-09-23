@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { liofaRead, liofaUpdate} = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -23,10 +22,11 @@ module.exports = {
 
 	async execute(interaction) {
     const inputs = interaction.options;
-		const GuildData = liofaRead(interaction.guild.id);
     if (inputs.getChannel('channel')) {
-			channel = inputs.getChannel('channel').id
-			GuildData.Settings.modlog = channel
+			channel = inputs.getChannel('channel').id;
+			const channelStr = channel.toString();
+			const updateModLog = { modlog_channel_id: channelStr };
+			interaction.client.dbFunctions.updateGuildData('SETTINGS', interaction.guild.id, updateModLog);
 			interaction.reply('My moderation actions will be sent to <#'+ channel +'>')
     }
 		else if (inputs._subcommand === 'clear') {
@@ -43,13 +43,11 @@ module.exports = {
 		else {
 			return interaction.reply('Something broke 😬');
 		}
-		liofaUpdate(interaction, GuildData);
   },
 	buttons : {
 		'confirm' : async function confirm(interaction) {
-			const GuildData = liofaRead(interaction.guild.id);
-			GuildData.Settings.modlog = null;
-			liofaUpdate(interaction, GuildData);
+			const updateModLog = { modlog_channel_id: 0 };
+			interaction.client.dbFunctions.updateGuildData('SETTINGS', interaction.guild.id, updateModLog);
 			const message = await interaction.message.fetch();
 			message.delete();
 			return interaction.channel.send('✅ modlog has been deactivated');

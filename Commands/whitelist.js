@@ -1,11 +1,6 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
-const {
-	arrayToggle,
-	liofaRead,
-	liofaPrefixCheck,
-	liofaUpdate
-} = require('../functions.js');
+const { arrayToggle, arrayString } = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -14,57 +9,67 @@ module.exports = {
 		.addStringOption(keyword => keyword.setName('keyword').setDescription('Word(s) to add to the whitelist').setRequired(false)),
 
 	usage: '<words to add to the whitelist>',
-	async execute(message) {
-		const GuildData = liofaRead(message.guild.id);
-		const prefix = GuildData.Settings.prefix;
+	async execute(interaction) {
+		const { ignored_words : whitelistWords } = interaction.client.dbFunctions.getGuildData('SETTINGS', interaction.guild.id);
+		const whitelist = JSON.parse(whitelistWords);
 		let words = [];
-		if (liofaPrefixCheck(message)) {
-			const args = message.content.split(' ');
-			args.shift();
-			words = args;
-		}
-		else if (message.options.getString('keyword')) {
-			words = message.options.getString('keyword').split(' ');
+		if (interaction.options.getString('keyword')) {
+			words = interaction.options.getString('keyword').split(' ');
 		}
 		if (typeof words[0] === 'string') {
-			await whitelistToggle(message, words);
+			await whitelistToggle(interaction, words, whitelist);
 		}
 		else {
 			let list = '[';
-			liofaRead(message.guild.id).Settings.whitelist.forEach(element => list = list + element + '], [');
-			list = list.slice(0, -3);
+			if (whitelist.length == 0){
+				list = 'Empty';
+			}
+			else {
+				whitelist.forEach(element => list = list + element + '], [');
+				list = list.slice(0, -3);
+			}
 			const whiteEmbed = new EmbedBuilder()
 				.setColor('#e1c4ff')
 				.setTitle('**Whitelisted Words:**')
 				.setDescription(list)
-				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
-			return message.reply({ embeds : [whiteEmbed] });
+				.setFooter({text:'Use /whitelist <words to add/remove> to edit the whitelist'});
+			return interaction.reply({ embeds : [whiteEmbed] });
 		}
 		// if you're adding a word or phrase
-		async function whitelistToggle(interaction, toggleList) {
+		async function whitelistToggle(interaction, words, whitelist) {
 			const commandReply = await interaction.channel.send('Editing Whitelist...');
+			let updatedList = whitelist;
 			let response = '';
-			for (let i = 0; i < toggleList.length; i++) {
-				const listLength = GuildData.Settings.whitelist.length;
-				GuildData.Settings.whitelist = arrayToggle(GuildData.Settings.whitelist, toggleList[i]);
-				if (listLength > GuildData.Settings.whitelist.length) {
+			for (let i = 0; i < words.length; i++) {
+				const listLength = updatedList.length;
+				updatedList = arrayToggle(updatedList, words[i]);
+				if (listLength > updatedList.length) {
 					response = response + '\n❌ `[' + words[i] + ']` removed from whitelist';
 				}
 				else {
 					response = response + '\n✅ `[' + words[i] + ']` added to whitelist';
 				}
 			}
+
 			let list = '[';
-			GuildData.Settings.whitelist.forEach(element => list = list + element + '], [');
-			list = list.slice(0, -3);
+			if (updatedList.length == 0){
+				list = 'Empty';
+			}
+			else {
+				updatedList.forEach(element => list = list + element + '], [');
+				list = list.slice(0, -3);
+			}
 			const togglelistEmbed = new EmbedBuilder()
 				.setColor('#e1c4ff')
 				.setTitle('**Whitelisted Words:**')
 				.setDescription(list + '\n' + response)
-				.setFooter('Use ' + prefix + 'whitelist <words to add/remove> to edit the whitelist');
+				.setFooter({text: 'Use /whitelist <words to add/remove> to edit the whitelist'});
 			interaction.reply({ embeds : [togglelistEmbed] });
 			commandReply.delete();
-			liofaUpdate(interaction, GuildData);
+
+			updatedList = arrayString(updatedList);
+			const newWhitelist = { ignored_words: updatedList };
+			interaction.client.dbFunctions.updateGuildData('SETTINGS', interaction.guild.id, newWhitelist);
 		}
 	},
 };

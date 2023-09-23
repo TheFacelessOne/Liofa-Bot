@@ -20,8 +20,7 @@ module.exports = {
 	},
 	buttons : {
 		'confirm' : async function confirm(interaction) {
-			const tempSettings = JSON.parse(fs.readFileSync('Read Only/Settings.json'));
-			fs.writeFileSync('Server Data/' + interaction.guild.id + '.json', JSON.stringify(tempSettings, null, 2));
+			interaction.client.dbFunctions.addGuild(interaction.guild.id);
 			console.log('Created settings file for ' + interaction.guild.id.toString());
 			const message = await interaction.message.fetch();
 			message.delete();

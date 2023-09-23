@@ -9,7 +9,7 @@ module.exports = {
 	name: 'MessageCreate',
 	async execute(msg) {
 
-		if (msg.author == msg.client.user) return; // Stops liofa reacting with itself
+		if (msg.author.id == msg.client.user.id) return; // Stops liofa reacting with itself
 
 		const {
 			approved_languages : languagesAllowed,
@@ -44,17 +44,17 @@ module.exports = {
 			const showButton = [Btn0, Btn1, Btn2, Btn3];
 			const languageIsAllowed = JSON.parse(languagesAllowed).includes(detectedLanguage.code);
 			const resultIsAccurate = parseInt(detectedLanguage.percent) >= 90; // must be 90% sure
-	
+
 			if (!languageIsAllowed && resultIsAccurate) {
-	
+
 				// Warnings Check
 				const infractionCount = watchlistIncrement(msg, msg.author.id);
 				const infractionsBeforeDeletion = warningsGiven + infractionsBeforeWarning;
 				const startDeleting = infractionCount > infractionsBeforeDeletion;
 				const startWarnings = infractionCount > infractionsBeforeWarning;
-				
+
 				const buttons = createButtons(showButton, msg);
-				
+
 				if (!startDeleting && startWarnings) {
 					sendWarning(msg, buttons, detectedLanguage);
 				}
@@ -67,20 +67,21 @@ module.exports = {
 					//Check if modlog is set and channel exists
 					if (modLogChannel && msg.client.channels.cache.has(modLogChannel)){
 						const log = msg.client.channels.cache.get(modLogChannel);
-						log.send({ embeds: [modLog(msg, infractionCount)]});}
+						log.send({embeds: [modLog(msg, infractionCount)]});
+					}
 					msg.delete();
 				}
 			}
 		}).catch( (error) => { console.info(error) });
 
-		
+
 		// Check for Language
 		async function filterAndDetectLanguage() {
 			filterOut = JSON.parse(ignoreTheseWords);
 			// Removes Emojis
 			// eslint-disable-next-line no-useless-escape
 			let MessageContent = msg.content.replace(new RegExp('\<a?\:[^ \>]+\>', 'g'), ' ');
-			
+
 			// Removes an array of words from a string
 			if (await filterOut.length > 0) {
 				const regex = new RegExp(filterOut.join('|'), 'gi');
@@ -118,7 +119,7 @@ function createButtons(showButton, msg) {
 		}
 		return buttons;
 	}
-	
+
 	return false;
 
 }

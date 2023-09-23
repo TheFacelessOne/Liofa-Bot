@@ -53,7 +53,7 @@ function prepDatabases() {
 			button_support BOOLEAN DEFAULT TRUE,
 			button_vote BOOLEAN DEFAULT TRUE,
 			tier INTEGER DEFAULT 0,
-			modlog_channel_id INTEGER DEFAULT 0
+			modlog_channel_id TEXT DEFAULT NULL
 		);
 	`).run();
 	db.prepare(`
@@ -88,7 +88,7 @@ function prepDatabases() {
 		db.pragma("journal_mode = wal");
 
 		process.on('SIGINT', () => {
-			db.close(); 
+			db.close();
 			console.log('Liofa\'s going back to sleep');
 			process.exit(0);
 			}
@@ -96,7 +96,7 @@ function prepDatabases() {
 }
 
 function prepDatabaseFunctions() {
-	
+
 		return {
 
 			addGuild : function(guildID) {
@@ -104,7 +104,7 @@ function prepDatabaseFunctions() {
 				db.prepare(`INSERT OR REPLACE INTO PERMISSIONS (guild_id) VALUES (?)`).run(guildID);
 				console.log(`Guild Added ${guildID}`);
 			},
-		
+
 			getGuildData : function(tableName, guildID, dataQuery = '*') {
 				const blockedTables = ['WATCHLIST'];
 				try{
@@ -113,7 +113,7 @@ function prepDatabaseFunctions() {
 				}
 				catch(err) {console.error(err)}
 			},
-		
+
 			updateGuildData : function(tableName, guildID, dataObject) {
 				const blockedTables = ['WATCHLIST'];
 				try {
@@ -123,14 +123,14 @@ function prepDatabaseFunctions() {
 						newData += `${key} = ${dataObject[key]}, `
 					})
 					newData = newData.slice(0, -2);
-					db.prepare(`UPDATE ${tableName} SET ${newData} WHERE ${guildID}`).run();
+					db.prepare(`UPDATE ${tableName} SET ${newData} WHERE guild_id = ${guildID}`).run();
 				}
 				catch(err) {console.error(err)}
 			},
 
 			updateWatchlist : function (guildID, userID, infractions) {db.prepare(`INSERT OR REPLACE INTO WATCHLIST (guild_id, user_id, infractions, time) VALUES (${guildID}, ${userID}, ${infractions}, datetime('now', 'localtime'))`).run() },
-		
+
 			getWatchlist : function (guildID, userID) {return db.prepare(`SELECT * FROM WATCHLIST WHERE guild_id = ${guildID} AND user_id = ${userID}`).get() },
-		
+
 		}
 }

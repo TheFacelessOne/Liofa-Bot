@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { EmbedBuilder } = require('discord.js');
 const fs = require('fs');
-const { boldText, liofaRead, liofaPrefixCheck, arrayToggle, minsToMilli, liofaUpdate} = require('../functions.js');
+const { boldText, arrayToggle, arrayString, minsToMilli, liofaUpdate} = require('../functions.js');
 
 module.exports = {
 	data : new SlashCommandBuilder()
@@ -26,16 +26,8 @@ module.exports = {
 
 	usage: '[list <option> | [edit [prefix [new prefix] | languages [language code] | time [minutes] | warnings [warning count] | startwarnings [allowed messages]]',
 	execute(interaction) {
-		const GuildData = liofaRead(interaction.guild.id);
 		let inputs = [];
-
-		if (liofaPrefixCheck(interaction)) {
-			inputs = interaction.content.split(' ');
-			inputs.shift();
-		}
-		else {
-			inputs = [interaction.options.getSubcommand(), interaction.options.getString('setting'), interaction.options.getString('value')];
-		}
+		inputs = [interaction.options.getSubcommand(), interaction.options.getString('setting'), interaction.options.getString('value')];
 		if (inputs[0] === 'list') {
 			return settingsList(inputs, interaction);
 		}
@@ -47,90 +39,121 @@ module.exports = {
 		}
 
 		async function settingsList(args) {
-			if (typeof args[1] === 'object' || typeof args[1] === 'undefined') {
+			const {
+				button_translate : Btn0,
+				button_vote : Btn1,
+				button_undo : Btn2,
+				button_support : Btn3,
+				approved_languages : languagesAllowed,
+				warnings_given : warningsGiven,
+				start_warnings : infractionsBeforeWarning,
+				infraction_length: infractionTime,
+				ignored_words : whitelistWords,
+				state : state,
+				disabled_channels_ids : ignoredChannelIDs,
+				disabled_channel_keywords: ignoredChannelKeywords
+			} = interaction.client.dbFunctions.getGuildData('SETTINGS', interaction.guild.id);
+			const buttons = [Btn0, Btn1, Btn2, Btn3];
+			const buttonNames = [];
+			buttons.forEach((button, index) => {
+			  button ? buttonNames.push(index === 0 ? 'translate' : index === 1 ? 'vote' : index === 2 ? 'undo' : 'support') : null;
+			});
+			const whitelist = JSON.parse(whitelistWords);
+			const languages = JSON.parse(languagesAllowed);
+			const channels = JSON.parse(ignoredChannelIDs);
+			const channelIgnore = JSON.parse(ignoredChannelKeywords);
+			if (inputs[1] !== null) {
+				function generateList(args) {
+					let settingArray = `__**${inputs[1]} contains:**__`;
+					if (args.length !== 0) {
+						let list = '';
+						args.forEach(element => list += element + '\n');
+						settingArray = settingArray.concat('\n' + list);
+					} else {
+						settingArray = settingArray.concat(' Nothing');
+					}
+					return interaction.reply(settingArray);
+				}
+				switch (inputs[1]) {
+					case 'whitelist': generateList(whitelist); break;
+					case 'languages': generateList(languages); break;
+					case 'channels': generateList(channels); break;
+					case 'channelIgnore': generateList(channelIgnore); break;
+					case 'buttons': generateList(buttonNames); break;
+					case 'modlog': generateList(modlog); break;
+				}
+			}
+			else {
 				let stateEmoji;
-				GuildData.Settings.state ? stateEmoji = '✅' : stateEmoji = '❌';
-				const infractionsIgnoredAfter = Math.floor((GuildData.Settings.time / 1000) / 60);
+				state ? stateEmoji = '✅' : stateEmoji = '❌';
+				const infractionsIgnoredAfter = Math.floor((infractionTime / 1000) / 60);
 
 				const listEmbed = new EmbedBuilder()
 					.setColor('#00ff08')
 					.setTitle('Settings')
 					.addFields(
 						{ name : 'State', value : stateEmoji, inline : true },
-						{ name : 'Whitelist contains', value : boldText(GuildData.Settings.whitelist.length) + ' entries', inline : true },
-						{ name : 'Languages contains', value : boldText(GuildData.Settings.languages.length) + ' accepted languages', inline : true },
+						{ name : 'Whitelist contains', value : boldText(whitelist.length) + ' entries', inline : true },
+						{ name : 'Languages contains', value : boldText(languages.length) + ' accepted languages', inline : true },
 						{ name: '\u200B', value: '\u200B' },
 						{ name : 'Infractions ignored after', value : boldText(infractionsIgnoredAfter) + ' minutes', inline : true },
-						{ name : 'Messages before warning', value : boldText(GuildData.Settings.startwarnings) + ' messages allowed', inline : true },
-						{ name : 'Maximum warnings', value : boldText(GuildData.Settings.warnings) + ' warnings given', inline : true },
+						{ name : 'Messages before warning', value : boldText(infractionsBeforeWarning) + ' messages allowed', inline : true },
+						{ name : 'Maximum warnings', value : boldText(warningsGiven) + ' warnings given', inline : true },
 						{ name: '\u200B', value: '\u200B' },
-						{ name : 'Whitelisted channels', value : boldText(GuildData.Settings.channels.length) + ' channels', inline : true },
-						{ name : 'Ignored channel keywords', value : boldText(GuildData.Settings.channelIgnore.length) + ' entries', inline : true },
-						{ name : 'Prefix', value : boldText(GuildData.Settings.prefix), inline : true },
+						{ name : 'Whitelisted channels', value : boldText(channels.length) + ' channels', inline : true },
+						{ name : 'Ignored channel keywords', value : boldText(channelIgnore.length) + ' entries', inline : true },
+						{ name : 'Active buttons', value : boldText(buttonNames.length), inline : true },
 					)
 					.setFooter({ text : 'Settings listed are for ' + interaction.guild.id });
 				return interaction.reply({ embeds : [listEmbed] });
-			}
-			else if (typeof GuildData.Settings[args[1]] === 'object') {
-				let settingArray = '__**' + args[1] + ' contains:**__';
-				if (GuildData.Settings[args[1]].length != 0) {
-					let list = '';
-					GuildData.Settings[args[1]].forEach(element => list = list + element + '\n');
-					settingArray = settingArray.concat('\n' + list);
-					return interaction.reply(settingArray);
-				}
-				else {
-					settingArray = settingArray.concat(' Nothing');
-					return interaction.reply(settingArray);
-				}
 			}
 			return;
 		}
 
 		async function settingsEdit(args) {
-			switch (args[1]) {
-			case 'prefix':
-				GuildData.Settings.prefix = args[2].toString();
-				interaction.reply('prefix updated to: "' + GuildData.Settings.prefix.toString() + '"');
-				break;
-
+			let updateSetting;
+			const { approved_languages : languagesAllowed } = interaction.client.dbFunctions.getGuildData('SETTINGS', interaction.guild.id);
+			let languages = JSON.parse(languagesAllowed);
+			switch (inputs[1]) {
 			case 'languages':
-				GuildData.Settings.languages = arrayToggle(GuildData.Settings.languages, args[2]);
-				interaction.reply('Accepted Language codes now contains: \n' + GuildData.Settings.languages);
+				let lang = arrayToggle(languages, inputs[2]);
+				lang = arrayString(lang);
+				updateSetting =  { approved_languages: lang };
+				interaction.reply('Accepted Language codes now contains: \n' + languages);
 				break;
 
 			case 'time':
-				if (isNaN(args[2])) {
+				if (isNaN(inputs[2])) {
 					return interaction.reply('Please provide a number in minutes for the length of time to keep track of the last infraction');
 				}
 				else {
-					GuildData.Settings.time = minsToMilli(args[2]);
-					interaction.reply(args[2] + ' minutes will be allowed before a user\'s infractions are reset');
+					updateSetting =  { infraction_length: minsToMilli(inputs[2]) };
+					interaction.reply(inputs[2] + ' minutes will be allowed before a user\'s infractions are reset');
 				}
 				break;
 			case 'warnings':
-				if (isNaN(args[2])) {
+				if (isNaN(inputs[2])) {
 					interaction.reply('Please provide a number of warnings to be given before a user\'s messages are deleted');
 					return;
 				}
 				else {
-					GuildData.Settings.warnings = args[2];
-					interaction.reply(args[2] + ' warnings will be given before a user\'s messages are deleted');
+					updateSetting = { warnings_given : inputs[2] };
+					interaction.reply(inputs[2] + ' warnings will be given before a user\'s messages are deleted');
 				}
 				break;
 			case 'startwarnings':
-				if (isNaN(args[2])) {
+				if (isNaN(inputs[2])) {
 					return interaction.reply('Please provide a number of messages to be allowed before a warning is given');
 				}
 				else {
-					GuildData.Settings.startwarnings = args[2];
-					interaction.reply(args[2] + ' messages will be allowed before a warning is given');
+					updateSetting = { start_warnings : inputs[2] };
+					interaction.reply(inputs[2] + ' messages will be allowed before a warning is given');
 				}
 				break;
 			default:
-				return interaction.reply('No acceptable arguments were given. \n Acceptable arguments include "list, prefix, languages, time, warnings, startwarnings"');
+				return interaction.reply('No acceptable arguments were given. \n Acceptable arguments include "list, languages, time, warnings, startwarnings"');
 			}
-			liofaUpdate(interaction, GuildData);
+			interaction.client.dbFunctions.updateGuildData('SETTINGS', interaction.guild.id, updateSetting);
 		}
 	},
 };

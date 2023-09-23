@@ -2,6 +2,7 @@ module.exports = {
 	minutesSince,
 	minsToMilli,
 	arrayToggle,
+	arrayString,
 	liofaPermsCheck,
 	onlyOne,
 	capitalizeFirstLetter,
@@ -29,6 +30,12 @@ function arrayToggle(list, input) {
 	else {
 		list.push(input);
 	}
+	return list;
+}
+
+function arrayString(list){
+	list = JSON.stringify(list);
+	list = `'${list}'`
 	return list;
 }
 
@@ -75,7 +82,7 @@ function watchlistIncrement(interaction, target) {
 	const infractionsHaveTimedOut = (Date.now() - Date.parse(time)) > infractionTimeout;
 
 	if (infractionsHaveTimedOut) { infractions = 0 }
-	
+
 	infractions++;
 	db.updateWatchlist(interaction.guild.id, target, infractions);
 	return infractions;
